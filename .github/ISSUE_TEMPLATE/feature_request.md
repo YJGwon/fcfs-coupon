@@ -17,3 +17,7 @@ assignees: YJGwon
 
 ### Note
 <!--추가로 덧붙일 내용-->
+
+### Due Date
+<!--마감 기한(yyyy-mm-dd)-->
+
