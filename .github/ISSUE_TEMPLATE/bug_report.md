@@ -7,7 +7,7 @@ assignees: YJGwon
 
 ---
 
-### Discribtion
+### Description
 <!--버그에 대한 간략한 설명-->
 
 
