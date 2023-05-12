@@ -18,6 +18,7 @@ public class CouponService {
                          final RequestTime requestTime) {
         this.couponCountRepository = couponCountRepository;
         this.requestTime = requestTime;
+        couponCountRepository.setCount(0);
     }
 
     public CouponResponse issue() {
