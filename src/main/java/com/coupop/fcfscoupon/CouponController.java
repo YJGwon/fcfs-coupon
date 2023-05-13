@@ -3,6 +3,7 @@ package com.coupop.fcfscoupon;
 import com.coupop.fcfscoupon.dto.CouponResponse;
 import com.coupop.fcfscoupon.execption.ApiException;
 import com.coupop.fcfscoupon.execption.CouponNotOpenedException;
+import com.coupop.fcfscoupon.execption.CouponOutOfStockException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -25,7 +26,7 @@ public class CouponController {
         return couponService.issue();
     }
 
-    @ExceptionHandler(CouponNotOpenedException.class)
+    @ExceptionHandler({CouponNotOpenedException.class, CouponOutOfStockException.class})
     public ErrorResponse handleCouponNotOpenedException(final ApiException e) {
         return ErrorResponse.builder(e, e.getHttpStatus(), e.getMessage())
                 .type(e.getType())

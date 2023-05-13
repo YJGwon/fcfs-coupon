@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.coupop.fcfscoupon.dto.CouponResponse;
 import com.coupop.fcfscoupon.execption.CouponNotOpenedException;
+import com.coupop.fcfscoupon.execption.CouponOutOfStockException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,5 +62,22 @@ class CouponControllerTest {
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("title").value("쿠폰이 아직 오픈되지 않았습니다."));
+    }
+
+    @DisplayName("쿠폰 발행시, 쿠폰 재고가 소진되었으면 Bad Request 상태를 반환한다.")
+    @Test
+    void issue_responseError_ifCouponOutOfStock() throws Exception {
+        // given
+        doThrow(new CouponOutOfStockException())
+                .when(couponService).issue();
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(post("/issue"));
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("title").value("쿠폰이 모두 소진되었습니다."));
     }
 }
