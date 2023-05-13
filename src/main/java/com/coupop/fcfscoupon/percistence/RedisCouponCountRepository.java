@@ -19,8 +19,8 @@ public class RedisCouponCountRepository implements CouponCountRepository {
     }
 
     @Override
-    public void increaseCount() {
-        couponCountOperations.increment(getKey());
+    public int increaseCount() {
+        return Math.toIntExact(couponCountOperations.increment(getKey()));
     }
 
     @Override

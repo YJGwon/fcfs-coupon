@@ -25,9 +25,17 @@ public class CouponService {
         checkCouponOpen();
         checkCouponInStock();
 
+        final int increasedCount = couponCountRepository.increaseCount();
+        checkOverIssue(increasedCount);
+
         final Coupon coupon = new Coupon("뭔가 좋은 쿠폰");
-        couponCountRepository.increaseCount();
         return CouponResponse.of(coupon);
+    }
+
+    private void checkCouponOpen() {
+        if (CouponIssuePolicy.isCouponClosed(requestTime.getValue())) {
+            throw new CouponNotOpenedException();
+        }
     }
 
     private void checkCouponInStock() {
@@ -36,9 +44,9 @@ public class CouponService {
         }
     }
 
-    private void checkCouponOpen() {
-        if (CouponIssuePolicy.isCouponClosed(requestTime.getValue())) {
-            throw new CouponNotOpenedException();
+    private void checkOverIssue(final int issuedCount) {
+        if (CouponIssuePolicy.isCouponOverIssued(issuedCount)) {
+            throw new CouponOutOfStockException();
         }
     }
 }

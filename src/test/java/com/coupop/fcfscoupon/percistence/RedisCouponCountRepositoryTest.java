@@ -15,7 +15,6 @@ class RedisCouponCountRepositoryTest {
     @Test
     void increaseCount() {
         redisCouponCountRepository.setCount(0);
-        redisCouponCountRepository.increaseCount();
-        assertThat(redisCouponCountRepository.getCount()).isEqualTo(1);
+        assertThat(redisCouponCountRepository.increaseCount()).isEqualTo(1);
     }
 }
