@@ -8,6 +8,7 @@ import com.coupop.fcfscoupon.dto.CouponRequest;
 import com.coupop.fcfscoupon.dto.CouponResponse;
 import com.coupop.fcfscoupon.execption.CouponNotOpenedException;
 import com.coupop.fcfscoupon.execption.CouponOutOfStockException;
+import com.coupop.fcfscoupon.execption.EmailAlreadyUsedException;
 import com.coupop.fcfscoupon.model.CouponCountRepository;
 import com.coupop.fcfscoupon.model.CouponIssuePolicy;
 import java.time.LocalTime;
@@ -66,6 +67,19 @@ class CouponServiceTest {
 
         // when & then
         assertThatExceptionOfType(CouponNotOpenedException.class)
+                .isThrownBy(() -> couponService.issue(request));
+    }
+
+    @DisplayName("쿠폰을 발급할 때 당일에 이미 사용된 이메일이면 예외가 발생한다.")
+    @Test
+    void issue_throwsException_ifEmailUsedToday() {
+        // given
+        final CouponRequest request = new CouponRequest("foo@bar.com");
+
+        couponService.issue(request);
+
+        // when & then
+        assertThatExceptionOfType(EmailAlreadyUsedException.class)
                 .isThrownBy(() -> couponService.issue(request));
     }
 

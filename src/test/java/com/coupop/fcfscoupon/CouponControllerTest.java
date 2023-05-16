@@ -1,5 +1,6 @@
 package com.coupop.fcfscoupon;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -11,6 +12,7 @@ import com.coupop.fcfscoupon.dto.CouponRequest;
 import com.coupop.fcfscoupon.dto.CouponResponse;
 import com.coupop.fcfscoupon.execption.CouponNotOpenedException;
 import com.coupop.fcfscoupon.execption.CouponOutOfStockException;
+import com.coupop.fcfscoupon.execption.EmailAlreadyUsedException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,7 +45,7 @@ class CouponControllerTest {
         final String message = "뭔가 좋은 쿠폰";
         final CouponResponse response = new CouponResponse(message);
 
-        given(couponService.issue())
+        given(couponService.issue(any(CouponRequest.class)))
                 .willReturn(response);
 
         // when
@@ -67,7 +69,7 @@ class CouponControllerTest {
         final String message = "뭔가 좋은 쿠폰";
         final CouponResponse response = new CouponResponse(message);
 
-        given(couponService.issue())
+        given(couponService.issue(any(CouponRequest.class)))
                 .willReturn(response);
 
         // when
@@ -82,6 +84,28 @@ class CouponControllerTest {
                 .andExpect(jsonPath("title").value("형식에 맞는 이메일을 입력하세요."));
     }
 
+    @DisplayName("쿠폰 발행시, 당일에 이미 사용된 이메일이면 Bad Request 상태를 반환한다.")
+    @Test
+    void issue_responseError_ifEmailUsedToday() throws Exception {
+        // given
+        final String email = "foo@bar.com";
+        final CouponRequest request = new CouponRequest(email);
+
+        doThrow(new EmailAlreadyUsedException(email))
+                .when(couponService).issue(any(CouponRequest.class));
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(post("/issue")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print());
+
+        // then
+        resultActions
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("title").value("이미 사용된 이메일입니다."));
+    }
+
     @DisplayName("쿠폰 발행시, 쿠폰이 오픈되지 않았으면 Bad Request 상태를 반환한다.")
     @Test
     void issue_responseError_ifCouponIsNotOpen() throws Exception {
@@ -89,7 +113,7 @@ class CouponControllerTest {
         final CouponRequest request = new CouponRequest("foo@bar.com");
 
         doThrow(new CouponNotOpenedException())
-                .when(couponService).issue();
+                .when(couponService).issue(any(CouponRequest.class));
 
         // when
         final ResultActions resultActions = mockMvc.perform(post("/issue")
@@ -110,7 +134,7 @@ class CouponControllerTest {
         final CouponRequest request = new CouponRequest("foo@bar.com");
 
         doThrow(new CouponOutOfStockException())
-                .when(couponService).issue();
+                .when(couponService).issue(any(CouponRequest.class));
 
         // when
         final ResultActions resultActions = mockMvc.perform(post("/issue")

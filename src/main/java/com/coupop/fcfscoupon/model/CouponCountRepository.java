@@ -2,7 +2,9 @@ package com.coupop.fcfscoupon.model;
 
 public interface CouponCountRepository {
 
-    int increaseCount();
+    Long increaseCount();
+
+    Long decreaseCount();
 
     int getCount();
 

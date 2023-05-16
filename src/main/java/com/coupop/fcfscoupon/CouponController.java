@@ -3,8 +3,6 @@ package com.coupop.fcfscoupon;
 import com.coupop.fcfscoupon.dto.CouponRequest;
 import com.coupop.fcfscoupon.dto.CouponResponse;
 import com.coupop.fcfscoupon.execption.ApiException;
-import com.coupop.fcfscoupon.execption.CouponNotOpenedException;
-import com.coupop.fcfscoupon.execption.CouponOutOfStockException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
@@ -28,10 +26,10 @@ public class CouponController {
     @PostMapping("/issue")
     @ResponseStatus(HttpStatus.CREATED)
     public CouponResponse issue(@RequestBody @Validated final CouponRequest request) {
-        return couponService.issue();
+        return couponService.issue(request);
     }
 
-    @ExceptionHandler({CouponNotOpenedException.class, CouponOutOfStockException.class})
+    @ExceptionHandler(ApiException.class)
     public ErrorResponse handleApiExceptions(final ApiException e) {
         return ErrorResponse.builder(e, e.getHttpStatus(), e.getMessage())
                 .type(e.getType())

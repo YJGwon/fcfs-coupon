@@ -9,8 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class RedisCouponCountRepository implements CouponCountRepository {
 
-    private static final String ERROR_NOT_INITIALIZED = "쿠폰 수량이 초기화되지 않았습니다.";
-    private static final String KEY_PREFIX = "coupon:";
+    private static final String PATTERN_KEY = "coupon:%s:count";
 
     private final ValueOperations<String, String> couponCountOperations;
 
@@ -19,8 +18,13 @@ public class RedisCouponCountRepository implements CouponCountRepository {
     }
 
     @Override
-    public int increaseCount() {
-        return Math.toIntExact(couponCountOperations.increment(getKey()));
+    public Long increaseCount() {
+        return couponCountOperations.increment(getKey());
+    }
+
+    @Override
+    public Long decreaseCount() {
+        return couponCountOperations.decrement(getKey());
     }
 
     @Override
@@ -38,6 +42,6 @@ public class RedisCouponCountRepository implements CouponCountRepository {
     }
 
     private String getKey() {
-        return KEY_PREFIX + LocalDate.now();
+        return String.format(PATTERN_KEY, LocalDate.now());
     }
 }

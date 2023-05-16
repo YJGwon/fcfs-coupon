@@ -94,6 +94,21 @@ public class CouponAcceptanceTest {
                 .body("title", equalTo("쿠폰이 아직 오픈되지 않았습니다."));
     }
 
+    @DisplayName("같은 이메일로 하루 두 번 쿠폰을 발급받을 수 없다.")
+    @Test
+    void issueCoupon_ifCouponUsedToday() {
+        // given
+        final CouponRequest request = new CouponRequest("foo@bar.com");
+        post(request);
+
+        // when
+        final ValidatableResponse response = post(request);
+
+        // then
+        response.statusCode(BAD_REQUEST.value())
+                .body("title", equalTo("이미 사용된 이메일입니다."));
+    }
+
     @DisplayName("쿠폰이 소진되면 쿠폰을 발급받을 수 없다.")
     @Test
     void issueCoupon_ifCouponOutOfStock() {
