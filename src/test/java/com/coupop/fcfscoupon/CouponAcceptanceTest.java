@@ -32,13 +32,16 @@ public class CouponAcceptanceTest {
     @Autowired
     private CouponCountRepository couponCountRepository;
 
+    @Autowired
+    private DatabaseCleanUp databaseCleanUp;
+
     @MockBean
     private RequestTime requestTime;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        couponCountRepository.setCount(0);
+        databaseCleanUp.execute();
 
         given(requestTime.getValue())
                 .willReturn(CouponIssuePolicy.getOpenAt());

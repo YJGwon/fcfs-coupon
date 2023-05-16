@@ -27,7 +27,7 @@ public class RedisCouponCountRepository implements CouponCountRepository {
     public int getCount() {
         String count = couponCountOperations.get(getKey());
         if (count == null) {
-            throw new IllegalArgumentException(ERROR_NOT_INITIALIZED);
+            return 0;
         }
         return Integer.parseInt(count);
     }
