@@ -16,7 +16,7 @@ public class CouponIssuePolicy {
         return issuedCount >= LIMIT;
     }
 
-    public static boolean isCouponOverIssued(int issuedCount) {
+    public static boolean isCouponOverIssued(Long issuedCount) {
         return issuedCount > LIMIT;
     }
 
