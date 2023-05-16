@@ -32,19 +32,19 @@ public class RedisCouponIssuanceRepository implements CouponIssuanceRepository {
         return getCount(stringRedisTemplate.opsForSet());
     }
 
-    private Long add(final String email, final SetOperations<String, String> setOperations) {
+    public Long add(final String email, final SetOperations<String, String> setOperations) {
         return setOperations.add(getKey(), email);
     }
 
-    private Long remove(final String email, final SetOperations<String, String> setOperations) {
+    public Long remove(final String email, final SetOperations<String, String> setOperations) {
         return setOperations.remove(getKey(), email);
     }
 
-    private Long getCount(final SetOperations<String, String> setOperations) {
+    public Long getCount(final SetOperations<String, String> setOperations) {
         return setOperations.size(getKey());
     }
 
-    private String getKey() {
+    public String getKey() {
         return String.format(PATTERN_KEY, LocalDate.now());
     }
 }
