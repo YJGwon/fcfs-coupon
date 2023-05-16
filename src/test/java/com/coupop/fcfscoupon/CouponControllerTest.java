@@ -7,14 +7,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.coupop.fcfscoupon.dto.CouponRequest;
 import com.coupop.fcfscoupon.dto.CouponResponse;
 import com.coupop.fcfscoupon.execption.CouponNotOpenedException;
 import com.coupop.fcfscoupon.execption.CouponOutOfStockException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -24,6 +27,9 @@ class CouponControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @MockBean
     private CouponService couponService;
 
@@ -31,18 +37,21 @@ class CouponControllerTest {
     @Test
     void issue() throws Exception {
         // given
+        final CouponRequest request = new CouponRequest("foo@bar.com");
         final String message = "뭔가 좋은 쿠폰";
-        final CouponResponse couponResponse = new CouponResponse(message);
+        final CouponResponse response = new CouponResponse(message);
 
         given(couponService.issue())
-                .willReturn(couponResponse);
+                .willReturn(response);
 
         // when
-        final ResultActions resultActions = mockMvc.perform(post("/issue"));
+        final ResultActions resultActions = mockMvc.perform(post("/issue")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print());
 
         // then
         resultActions
-                .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("value").value(message));
     }
@@ -51,15 +60,19 @@ class CouponControllerTest {
     @Test
     void issue_responseError_ifCouponIsNotOpen() throws Exception {
         // given
+        final CouponRequest request = new CouponRequest("foo@bar.com");
+
         doThrow(new CouponNotOpenedException())
                 .when(couponService).issue();
 
         // when
-        final ResultActions resultActions = mockMvc.perform(post("/issue"));
+        final ResultActions resultActions = mockMvc.perform(post("/issue")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print());
 
         // then
         resultActions
-                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("title").value("쿠폰이 아직 오픈되지 않았습니다."));
     }
@@ -68,15 +81,19 @@ class CouponControllerTest {
     @Test
     void issue_responseError_ifCouponOutOfStock() throws Exception {
         // given
+        final CouponRequest request = new CouponRequest("foo@bar.com");
+
         doThrow(new CouponOutOfStockException())
                 .when(couponService).issue();
 
         // when
-        final ResultActions resultActions = mockMvc.perform(post("/issue"));
+        final ResultActions resultActions = mockMvc.perform(post("/issue")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print());
 
         // then
         resultActions
-                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("title").value("쿠폰이 모두 소진되었습니다."));
     }

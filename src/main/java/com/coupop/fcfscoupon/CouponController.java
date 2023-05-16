@@ -1,5 +1,6 @@
 package com.coupop.fcfscoupon;
 
+import com.coupop.fcfscoupon.dto.CouponRequest;
 import com.coupop.fcfscoupon.dto.CouponResponse;
 import com.coupop.fcfscoupon.execption.ApiException;
 import com.coupop.fcfscoupon.execption.CouponNotOpenedException;
@@ -8,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,7 +24,7 @@ public class CouponController {
 
     @PostMapping("/issue")
     @ResponseStatus(HttpStatus.CREATED)
-    public CouponResponse issue() {
+    public CouponResponse issue(@RequestBody final CouponRequest request) {
         return couponService.issue();
     }
 

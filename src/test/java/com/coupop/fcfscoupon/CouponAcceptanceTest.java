@@ -5,9 +5,11 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 
+import com.coupop.fcfscoupon.dto.CouponRequest;
 import com.coupop.fcfscoupon.model.CouponCountRepository;
 import com.coupop.fcfscoupon.model.CouponIssuePolicy;
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,10 +47,13 @@ public class CouponAcceptanceTest {
     void issueCoupon() {
         // given
         final String path = "/issue";
+        final CouponRequest request = new CouponRequest("foo@bar.com");
 
         // when
         final ValidatableResponse response = RestAssured
                 .given().log().all()
+                .contentType(ContentType.JSON)
+                .body(request)
                 .when()
                 .post(path)
                 .then().log().all();
@@ -63,6 +68,8 @@ public class CouponAcceptanceTest {
     void issueCoupon_ifCouponIsNotOpen() {
         // given
         final String path = "/issue";
+        final CouponRequest request = new CouponRequest("foo@bar.com");
+
         final LocalTime closedTime = LocalTime.of(9, 59);
         given(requestTime.getValue())
                 .willReturn(closedTime);
@@ -70,6 +77,8 @@ public class CouponAcceptanceTest {
         // when
         final ValidatableResponse response = RestAssured
                 .given().log().all()
+                .contentType(ContentType.JSON)
+                .body(request)
                 .when()
                 .post(path)
                 .then().log().all();
@@ -84,11 +93,15 @@ public class CouponAcceptanceTest {
     void issueCoupon_ifCouponOutOfStock() {
         // given
         final String path = "/issue";
+        final CouponRequest request = new CouponRequest("foo@bar.com");
+
         couponCountRepository.setCount(CouponIssuePolicy.getLimit());
 
         // when
         final ValidatableResponse response = RestAssured
                 .given().log().all()
+                .contentType(ContentType.JSON)
+                .body(request)
                 .when()
                 .post(path)
                 .then().log().all();
