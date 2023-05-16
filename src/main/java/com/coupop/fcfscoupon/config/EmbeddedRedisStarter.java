@@ -4,6 +4,8 @@ import jakarta.annotation.PreDestroy;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,7 +40,7 @@ public class EmbeddedRedisStarter {
 
     private boolean isAvailable(final int port) throws IOException {
         final Process process = findPortAtCmd(port);
-        return isEmpty(process);
+        return isEmpty(port, process);
     }
 
     private Process findPortAtCmd(final int port) throws IOException {
@@ -46,17 +48,19 @@ public class EmbeddedRedisStarter {
         return Runtime.getRuntime().exec(command);
     }
 
-    private boolean isEmpty(Process process) {
-        String line;
-        StringBuilder pidInfo = new StringBuilder();
+    private boolean isEmpty(final int port, final Process process) {
+        final List<String> pidInfos = new ArrayList<>();
 
+        String line;
         try (BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
             while ((line = input.readLine()) != null) {
-                pidInfo.append(line);
+                pidInfos.add(line);
             }
         } catch (Exception e) {
         }
 
-        return pidInfo.toString().isBlank();
+        return pidInfos.stream()
+                .map(str -> str.split("\\s+"))
+                .noneMatch(arr -> String.format("127.0.0.1:%d", port).equals(arr[2]));
     }
 }
