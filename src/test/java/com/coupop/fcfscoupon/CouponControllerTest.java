@@ -14,6 +14,8 @@ import com.coupop.fcfscoupon.execption.CouponOutOfStockException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -54,6 +56,30 @@ class CouponControllerTest {
         resultActions
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("value").value(message));
+    }
+
+    @DisplayName("쿠폰 발행시, 이메일이 형식에 맞지 않으면 Bad Request 상태를 반환한다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"foobar.com", "foo@", "foo@com"})
+    void issue_responseError_ifEmailInvalid(final String invalidEmail) throws Exception {
+        // given
+        final CouponRequest request = new CouponRequest(invalidEmail);
+        final String message = "뭔가 좋은 쿠폰";
+        final CouponResponse response = new CouponResponse(message);
+
+        given(couponService.issue())
+                .willReturn(response);
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(post("/issue")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print());
+
+        // then
+        resultActions
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("title").value("형식에 맞는 이메일을 입력하세요."));
     }
 
     @DisplayName("쿠폰 발행시, 쿠폰이 오픈되지 않았으면 Bad Request 상태를 반환한다.")

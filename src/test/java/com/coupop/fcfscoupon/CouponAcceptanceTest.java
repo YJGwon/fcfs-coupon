@@ -15,6 +15,8 @@ import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -61,6 +63,28 @@ public class CouponAcceptanceTest {
         // then
         response.statusCode(CREATED.value())
                 .body("value", equalTo("뭔가 좋은 쿠폰"));
+    }
+
+    @DisplayName("형식에 맞지 않는 이메일을 입력하면 쿠폰을 발급받을 수 없다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"foobar.com", "foo@", "foo@com"})
+    void issueCoupon_ifEmailInvalid(final String invalidEmail) {
+        // given
+        final String path = "/issue";
+        final CouponRequest request = new CouponRequest(invalidEmail);
+
+        // when
+        final ValidatableResponse response = RestAssured
+                .given().log().all()
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post(path)
+                .then().log().all();
+
+        // then
+        response.statusCode(BAD_REQUEST.value())
+                .body("title", equalTo("형식에 맞는 이메일을 입력하세요."));
     }
 
     @DisplayName("쿠폰이 오픈되지 않았으면 쿠폰을 발급받을 수 없다.")
