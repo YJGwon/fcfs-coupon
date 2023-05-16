@@ -48,17 +48,10 @@ public class CouponAcceptanceTest {
     @Test
     void issueCoupon() {
         // given
-        final String path = "/issue";
         final CouponRequest request = new CouponRequest("foo@bar.com");
 
         // when
-        final ValidatableResponse response = RestAssured
-                .given().log().all()
-                .contentType(ContentType.JSON)
-                .body(request)
-                .when()
-                .post(path)
-                .then().log().all();
+        final ValidatableResponse response = post(request);
 
         // then
         response.statusCode(CREATED.value())
@@ -70,17 +63,10 @@ public class CouponAcceptanceTest {
     @ValueSource(strings = {"foobar.com", "foo@", "foo@com"})
     void issueCoupon_ifEmailInvalid(final String invalidEmail) {
         // given
-        final String path = "/issue";
         final CouponRequest request = new CouponRequest(invalidEmail);
 
         // when
-        final ValidatableResponse response = RestAssured
-                .given().log().all()
-                .contentType(ContentType.JSON)
-                .body(request)
-                .when()
-                .post(path)
-                .then().log().all();
+        final ValidatableResponse response = post(request);
 
         // then
         response.statusCode(BAD_REQUEST.value())
@@ -91,7 +77,6 @@ public class CouponAcceptanceTest {
     @Test
     void issueCoupon_ifCouponIsNotOpen() {
         // given
-        final String path = "/issue";
         final CouponRequest request = new CouponRequest("foo@bar.com");
 
         final LocalTime closedTime = LocalTime.of(9, 59);
@@ -99,13 +84,7 @@ public class CouponAcceptanceTest {
                 .willReturn(closedTime);
 
         // when
-        final ValidatableResponse response = RestAssured
-                .given().log().all()
-                .contentType(ContentType.JSON)
-                .body(request)
-                .when()
-                .post(path)
-                .then().log().all();
+        final ValidatableResponse response = post(request);
 
         // then
         response.statusCode(BAD_REQUEST.value())
@@ -116,22 +95,25 @@ public class CouponAcceptanceTest {
     @Test
     void issueCoupon_ifCouponOutOfStock() {
         // given
-        final String path = "/issue";
         final CouponRequest request = new CouponRequest("foo@bar.com");
 
         couponCountRepository.setCount(CouponIssuePolicy.getLimit());
 
         // when
-        final ValidatableResponse response = RestAssured
-                .given().log().all()
-                .contentType(ContentType.JSON)
-                .body(request)
-                .when()
-                .post(path)
-                .then().log().all();
+        final ValidatableResponse response = post(request);
 
         // then
         response.statusCode(BAD_REQUEST.value())
                 .body("title", equalTo("쿠폰이 모두 소진되었습니다."));
+    }
+
+    private static ValidatableResponse post(final CouponRequest request) {
+        return RestAssured
+                .given().log().all()
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post("/issue")
+                .then().log().all();
     }
 }
