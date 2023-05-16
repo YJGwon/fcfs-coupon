@@ -9,7 +9,6 @@ import com.coupop.fcfscoupon.dto.CouponResponse;
 import com.coupop.fcfscoupon.execption.CouponNotOpenedException;
 import com.coupop.fcfscoupon.execption.CouponOutOfStockException;
 import com.coupop.fcfscoupon.execption.EmailAlreadyUsedException;
-import com.coupop.fcfscoupon.model.CouponCountRepository;
 import com.coupop.fcfscoupon.model.CouponIssuePolicy;
 import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,17 +25,14 @@ class CouponServiceTest {
     private CouponService couponService;
 
     @Autowired
-    private CouponCountRepository couponCountRepository;
-
-    @Autowired
-    private DatabaseCleanUp databaseCleanUp;
+    private DatabaseSetUp databaseSetUp;
 
     @MockBean
     private RequestTime requestTime;
 
     @BeforeEach
     void setUp() {
-        databaseCleanUp.execute();
+        databaseSetUp.clean();
 
         given(requestTime.getValue())
                 .willReturn(CouponIssuePolicy.getOpenAt());
@@ -89,7 +85,7 @@ class CouponServiceTest {
         // given
         final CouponRequest request = new CouponRequest("foo@bar.com");
 
-        couponCountRepository.setCount(CouponIssuePolicy.getLimit());
+        databaseSetUp.setCount(CouponIssuePolicy.getLimit());
 
         // when & then
         assertThatExceptionOfType(CouponOutOfStockException.class)

@@ -6,7 +6,6 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 
 import com.coupop.fcfscoupon.dto.CouponRequest;
-import com.coupop.fcfscoupon.model.CouponCountRepository;
 import com.coupop.fcfscoupon.model.CouponIssuePolicy;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -29,11 +28,9 @@ public class CouponAcceptanceTest {
     @LocalServerPort
     private int port;
 
-    @Autowired
-    private CouponCountRepository couponCountRepository;
 
     @Autowired
-    private DatabaseCleanUp databaseCleanUp;
+    private DatabaseSetUp databaseSetUp;
 
     @MockBean
     private RequestTime requestTime;
@@ -41,7 +38,7 @@ public class CouponAcceptanceTest {
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        databaseCleanUp.execute();
+        databaseSetUp.clean();
 
         given(requestTime.getValue())
                 .willReturn(CouponIssuePolicy.getOpenAt());
@@ -115,7 +112,7 @@ public class CouponAcceptanceTest {
         // given
         final CouponRequest request = new CouponRequest("foo@bar.com");
 
-        couponCountRepository.setCount(CouponIssuePolicy.getLimit());
+        databaseSetUp.setCount(CouponIssuePolicy.getLimit());
 
         // when
         final ValidatableResponse response = post(request);
