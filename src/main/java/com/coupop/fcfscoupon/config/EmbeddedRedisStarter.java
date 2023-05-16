@@ -4,20 +4,26 @@ import jakarta.annotation.PreDestroy;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import redis.embedded.RedisServer;
+
 
 @Component
 public class EmbeddedRedisStarter {
 
     private final RedisServer redisServer;
+    private final Logger logger = LoggerFactory.getLogger(EmbeddedRedisStarter.class);
 
     public EmbeddedRedisStarter(@Value("${spring.data.redis.port}") final int port) throws IOException {
         if (isAvailable(port)) {
             this.redisServer = new RedisServer(port);
             redisServer.start();
+            logger.atInfo().log("Embedded Redis Started");
         } else {
+            logger.atInfo().log("Port Not Available, Embedded Redis Already Started");
             redisServer = null;
         }
     }
@@ -26,6 +32,7 @@ public class EmbeddedRedisStarter {
     public void stopRedis() {
         if (redisServer != null) {
             redisServer.stop();
+            logger.atInfo().log("Embedded Redis Stopped");
         }
     }
 
