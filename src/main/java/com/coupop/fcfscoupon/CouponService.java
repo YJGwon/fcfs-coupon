@@ -1,34 +1,53 @@
 package com.coupop.fcfscoupon;
 
-import com.coupop.fcfscoupon.dto.CouponResponse;
+import com.coupop.fcfscoupon.dto.CouponRequest;
 import com.coupop.fcfscoupon.execption.CouponNotOpenedException;
 import com.coupop.fcfscoupon.execption.CouponOutOfStockException;
+import com.coupop.fcfscoupon.execption.EmailAlreadyUsedException;
 import com.coupop.fcfscoupon.model.Coupon;
-import com.coupop.fcfscoupon.model.CouponCountRepository;
+import com.coupop.fcfscoupon.model.CouponEmailSender;
 import com.coupop.fcfscoupon.model.CouponIssuePolicy;
+import com.coupop.fcfscoupon.percistence.RedisCouponIssuanceRepository;
+import com.coupop.fcfscoupon.percistence.TransactionalRedisOperations;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CouponService {
 
-    private final CouponCountRepository couponCountRepository;
+    private final RedisCouponIssuanceRepository couponIssuanceRepository;
+    private final TransactionalRedisOperations transactionalRedisOperations;
+    private final CouponEmailSender couponEmailSender;
+
     private final RequestTime requestTime;
 
-    public CouponService(final CouponCountRepository couponCountRepository,
+    public CouponService(final RedisCouponIssuanceRepository couponIssuanceRepository,
+                         final TransactionalRedisOperations transactionalRedisOperations,
+                         final CouponEmailSender couponEmailSender,
                          final RequestTime requestTime) {
-        this.couponCountRepository = couponCountRepository;
+        this.couponIssuanceRepository = couponIssuanceRepository;
+        this.transactionalRedisOperations = transactionalRedisOperations;
+        this.couponEmailSender = couponEmailSender;
         this.requestTime = requestTime;
     }
 
-    public CouponResponse issue() {
+    public void issue(final CouponRequest request) {
         checkCouponOpen();
-        checkCouponInStock();
+        final String email = request.email();
+        final List<Object> result = transactionalRedisOperations.startSession()
+                .multi()
+                .andThen(ops -> couponIssuanceRepository.getCount(ops.opsForSet()))
+                .andThen(ops -> couponIssuanceRepository.add(email))
+                .exec();
 
-        final int increasedCount = couponCountRepository.increaseCount();
-        checkOverIssue(increasedCount);
+        final Long count = (Long) result.get(0);
+        checkCouponInStock(count.intValue(), email); // remove email
+
+        final Long addResult = (Long) result.get(1);
+        checkEmailNotUsedToday(addResult, email);
 
         final Coupon coupon = new Coupon("뭔가 좋은 쿠폰");
-        return CouponResponse.of(coupon);
+        couponEmailSender.send(coupon, email);
     }
 
     private void checkCouponOpen() {
@@ -37,15 +56,16 @@ public class CouponService {
         }
     }
 
-    private void checkCouponInStock() {
-        if (CouponIssuePolicy.isCouponOutOfStock(couponCountRepository.getCount())) {
+    private void checkCouponInStock(final int count, final String email) {
+        if (CouponIssuePolicy.isCouponOutOfStock(count)) {
+            couponIssuanceRepository.remove(email);
             throw new CouponOutOfStockException();
         }
     }
 
-    private void checkOverIssue(final int issuedCount) {
-        if (CouponIssuePolicy.isCouponOverIssued(issuedCount)) {
-            throw new CouponOutOfStockException();
+    private void checkEmailNotUsedToday(final Long result, final String email) {
+        if (result.equals(0L)) {
+            throw new EmailAlreadyUsedException(email);
         }
     }
 }
