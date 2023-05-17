@@ -1,4 +1,4 @@
-package com.coupop.fcfscoupon;
+package com.coupop.fcfscoupon.testconfig;
 
 import com.coupop.fcfscoupon.model.CouponIssuanceRepository;
 import org.springframework.data.redis.core.StringRedisTemplate;

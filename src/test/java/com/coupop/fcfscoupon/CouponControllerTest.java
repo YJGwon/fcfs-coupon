@@ -1,7 +1,6 @@
 package com.coupop.fcfscoupon;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -9,7 +8,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.coupop.fcfscoupon.dto.CouponRequest;
-import com.coupop.fcfscoupon.dto.CouponResponse;
 import com.coupop.fcfscoupon.execption.CouponNotOpenedException;
 import com.coupop.fcfscoupon.execption.CouponOutOfStockException;
 import com.coupop.fcfscoupon.execption.EmailAlreadyUsedException;
@@ -37,16 +35,11 @@ class CouponControllerTest {
     @MockBean
     private CouponService couponService;
 
-    @DisplayName("쿠폰 발행에 성공하면 쿠폰 내용과 함께 Created 상태를 반환한다.")
+    @DisplayName("쿠폰 발행에 성공하면 쿠폰 내용과 함께 Accepted 상태를 반환한다.")
     @Test
     void issue() throws Exception {
         // given
         final CouponRequest request = new CouponRequest("foo@bar.com");
-        final String message = "뭔가 좋은 쿠폰";
-        final CouponResponse response = new CouponResponse(message);
-
-        given(couponService.issue(any(CouponRequest.class)))
-                .willReturn(response);
 
         // when
         final ResultActions resultActions = mockMvc.perform(post("/issue")
@@ -56,8 +49,7 @@ class CouponControllerTest {
 
         // then
         resultActions
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("value").value(message));
+                .andExpect(status().isAccepted());
     }
 
     @DisplayName("쿠폰 발행시, 이메일이 형식에 맞지 않으면 Bad Request 상태를 반환한다.")
@@ -66,11 +58,6 @@ class CouponControllerTest {
     void issue_responseError_ifEmailInvalid(final String invalidEmail) throws Exception {
         // given
         final CouponRequest request = new CouponRequest(invalidEmail);
-        final String message = "뭔가 좋은 쿠폰";
-        final CouponResponse response = new CouponResponse(message);
-
-        given(couponService.issue(any(CouponRequest.class)))
-                .willReturn(response);
 
         // when
         final ResultActions resultActions = mockMvc.perform(post("/issue")
