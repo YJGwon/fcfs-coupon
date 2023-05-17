@@ -22,6 +22,9 @@ dependencies {
     // spring validation
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
+    // spring mail
+    implementation("org.springframework.boot:spring-boot-starter-mail")
+
     // embedded-redis
     implementation("it.ozimov:embedded-redis:0.7.2")
 

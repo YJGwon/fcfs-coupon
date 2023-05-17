@@ -1,7 +1,6 @@
 package com.coupop.fcfscoupon;
 
 import com.coupop.fcfscoupon.dto.CouponRequest;
-import com.coupop.fcfscoupon.dto.CouponResponse;
 import com.coupop.fcfscoupon.execption.ApiException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
@@ -24,9 +23,9 @@ public class CouponController {
     }
 
     @PostMapping("/issue")
-    @ResponseStatus(HttpStatus.CREATED)
-    public CouponResponse issue(@RequestBody @Validated final CouponRequest request) {
-        return couponService.issue(request);
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void issue(@RequestBody @Validated final CouponRequest request) {
+        couponService.issue(request);
     }
 
     @ExceptionHandler(ApiException.class)
@@ -44,5 +43,10 @@ public class CouponController {
                 .type(e.getBody().getType())
                 .title(fieldError.getDefaultMessage())
                 .build();
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ErrorResponse handleServerExceptions(final Exception e) {
+        return ErrorResponse.create(e, HttpStatus.INTERNAL_SERVER_ERROR, "서버에 오류가 발생했습니다.");
     }
 }

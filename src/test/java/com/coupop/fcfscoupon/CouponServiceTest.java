@@ -1,11 +1,10 @@
 package com.coupop.fcfscoupon;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.BDDMockito.given;
 
 import com.coupop.fcfscoupon.dto.CouponRequest;
-import com.coupop.fcfscoupon.dto.CouponResponse;
 import com.coupop.fcfscoupon.execption.CouponNotOpenedException;
 import com.coupop.fcfscoupon.execption.CouponOutOfStockException;
 import com.coupop.fcfscoupon.execption.EmailAlreadyUsedException;
@@ -17,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 
 @SpringBootTest
 class CouponServiceTest {
@@ -44,11 +44,9 @@ class CouponServiceTest {
         // given
         final CouponRequest request = new CouponRequest("foo@bar.com");
 
-        // when
-        final CouponResponse response = couponService.issue(request);
-
-        // then
-        assertThat(response.value()).isNotBlank();
+        // when & then
+        assertThatNoException()
+                .isThrownBy(() -> couponService.issue(request));
     }
 
     @DisplayName("쿠폰을 발급할 때 쿠폰이 열려있지 않으면 예외가 발생한다.")

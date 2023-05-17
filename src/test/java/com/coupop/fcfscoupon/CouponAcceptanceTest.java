@@ -2,8 +2,8 @@ package com.coupop.fcfscoupon;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.CREATED;
 
 import com.coupop.fcfscoupon.dto.CouponRequest;
 import com.coupop.fcfscoupon.model.CouponIssuePolicy;
@@ -21,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class CouponAcceptanceTest {
@@ -54,8 +55,7 @@ public class CouponAcceptanceTest {
         final ValidatableResponse response = post(request);
 
         // then
-        response.statusCode(CREATED.value())
-                .body("value", equalTo("뭔가 좋은 쿠폰"));
+        response.statusCode(ACCEPTED.value());
     }
 
     @DisplayName("형식에 맞지 않는 이메일을 입력하면 쿠폰을 발급받을 수 없다.")
