@@ -19,14 +19,20 @@ dependencies {
     // spring data redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
+    // spring data mongodb
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+
     // spring validation
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
     // spring mail
     implementation("org.springframework.boot:spring-boot-starter-mail")
 
-    // embedded-redis
+    // embedded redis
     implementation("it.ozimov:embedded-redis:0.7.2")
+
+    // embedded mongodb
+    implementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo.spring30x:4.6.2")
 
     // rest-assured
     testImplementation("io.rest-assured:rest-assured:5.3.0")
