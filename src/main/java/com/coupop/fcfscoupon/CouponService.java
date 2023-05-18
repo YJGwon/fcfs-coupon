@@ -10,6 +10,7 @@ import com.coupop.fcfscoupon.model.CouponIssuePolicy;
 import com.coupop.fcfscoupon.percistence.RedisCouponIssuanceRepository;
 import com.coupop.fcfscoupon.percistence.TransactionalRedisOperations;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,15 +21,18 @@ public class CouponService {
     private final CouponEmailSender couponEmailSender;
 
     private final RequestTime requestTime;
+    private final String secretKey;
 
     public CouponService(final RedisCouponIssuanceRepository couponIssuanceRepository,
                          final TransactionalRedisOperations transactionalRedisOperations,
                          final CouponEmailSender couponEmailSender,
-                         final RequestTime requestTime) {
+                         final RequestTime requestTime,
+                         @Value("${coupon.code.secretKey}") final String secretKey) {
         this.couponIssuanceRepository = couponIssuanceRepository;
         this.transactionalRedisOperations = transactionalRedisOperations;
         this.couponEmailSender = couponEmailSender;
         this.requestTime = requestTime;
+        this.secretKey = secretKey;
     }
 
     public void issue(final CouponRequest request) {
@@ -46,7 +50,7 @@ public class CouponService {
         final Long addResult = (Long) result.get(1);
         checkEmailNotUsedToday(addResult, email);
 
-        final Coupon coupon = new Coupon("뭔가 좋은 쿠폰");
+        final Coupon coupon = new Coupon(count, secretKey);
         couponEmailSender.send(coupon, email);
     }
 

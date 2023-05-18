@@ -18,7 +18,7 @@ class CouponEmailSenderImplTest {
     @DisplayName("쿠폰을 메일로 발송한다.")
     @Test
     void send() {
-        final Coupon coupon = new Coupon("쿠폰");
+        final Coupon coupon = new Coupon(0L, "secretKey");
         final String toAddress = "yj970125@gmail.com";
 
         couponEmailSender.send(coupon, toAddress);
