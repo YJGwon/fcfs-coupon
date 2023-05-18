@@ -7,10 +7,10 @@ import com.coupop.fcfscoupon.execption.EmailAlreadyUsedException;
 import com.coupop.fcfscoupon.model.Coupon;
 import com.coupop.fcfscoupon.model.CouponEmailSender;
 import com.coupop.fcfscoupon.model.CouponIssuePolicy;
+import com.coupop.fcfscoupon.model.RandomCodeGenerator;
 import com.coupop.fcfscoupon.percistence.RedisCouponIssuanceRepository;
 import com.coupop.fcfscoupon.percistence.TransactionalRedisOperations;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,18 +21,18 @@ public class CouponService {
     private final CouponEmailSender couponEmailSender;
 
     private final RequestTime requestTime;
-    private final String secretKey;
+    private final RandomCodeGenerator codeGenerator;
 
     public CouponService(final RedisCouponIssuanceRepository couponIssuanceRepository,
                          final TransactionalRedisOperations transactionalRedisOperations,
                          final CouponEmailSender couponEmailSender,
                          final RequestTime requestTime,
-                         @Value("${coupon.code.secretKey}") final String secretKey) {
+                         final RandomCodeGenerator codeGenerator) {
         this.couponIssuanceRepository = couponIssuanceRepository;
         this.transactionalRedisOperations = transactionalRedisOperations;
         this.couponEmailSender = couponEmailSender;
         this.requestTime = requestTime;
-        this.secretKey = secretKey;
+        this.codeGenerator = codeGenerator;
     }
 
     public void issue(final CouponRequest request) {
@@ -50,7 +50,7 @@ public class CouponService {
         final Long addResult = (Long) result.get(1);
         checkEmailNotUsedToday(addResult, email);
 
-        final Coupon coupon = new Coupon(count, secretKey);
+        final Coupon coupon = new Coupon(codeGenerator.generate(count));
         couponEmailSender.send(coupon, email);
     }
 
