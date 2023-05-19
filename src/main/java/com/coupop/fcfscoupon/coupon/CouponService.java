@@ -9,16 +9,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class CouponService {
 
-    private final CouponRepository couponRepository;
     private final RandomCodeGenerator codeGenerator;
     private final CouponEmailSender couponEmailSender;
+    private final CouponRepository couponRepository;
 
-    public CouponService(final CouponRepository couponRepository,
-                         final RandomCodeGenerator codeGenerator,
-                         final CouponEmailSender couponEmailSender) {
-        this.couponRepository = couponRepository;
+    public CouponService(final RandomCodeGenerator codeGenerator, final CouponEmailSender couponEmailSender,
+                         final CouponRepository couponRepository) {
         this.codeGenerator = codeGenerator;
         this.couponEmailSender = couponEmailSender;
+        this.couponRepository = couponRepository;
     }
 
     public void createAndSend(final Long sequence, final String email) {

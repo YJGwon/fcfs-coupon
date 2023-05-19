@@ -15,20 +15,22 @@ import org.springframework.stereotype.Service;
 @Service
 public class FcfsIssueService {
 
-    private final RedisFcfsIssueRepository redisFcfsIssueRepository;
-    private final TransactionalRedisOperations transactionalRedisOperations;
-    private final RequestTime requestTime;
 
     private final CouponService couponService;
 
-    public FcfsIssueService(final RedisFcfsIssueRepository redisFcfsIssueRepository,
+    private final RedisFcfsIssueRepository redisFcfsIssueRepository;
+    private final TransactionalRedisOperations transactionalRedisOperations;
+
+    private final RequestTime requestTime;
+
+    public FcfsIssueService(final CouponService couponService,
+                            final RedisFcfsIssueRepository redisFcfsIssueRepository,
                             final TransactionalRedisOperations transactionalRedisOperations,
-                            final RequestTime requestTime,
-                            final CouponService couponService) {
+                            final RequestTime requestTime) {
+        this.couponService = couponService;
         this.redisFcfsIssueRepository = redisFcfsIssueRepository;
         this.transactionalRedisOperations = transactionalRedisOperations;
         this.requestTime = requestTime;
-        this.couponService = couponService;
     }
 
     public void issue(final IssuanceRequest request) {
