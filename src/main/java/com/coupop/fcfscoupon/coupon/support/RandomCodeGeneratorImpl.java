@@ -1,6 +1,6 @@
-package com.coupop.fcfscoupon.infra;
+package com.coupop.fcfscoupon.coupon.support;
 
-import com.coupop.fcfscoupon.model.RandomCodeGenerator;
+import com.coupop.fcfscoupon.coupon.model.RandomCodeGenerator;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Objects;

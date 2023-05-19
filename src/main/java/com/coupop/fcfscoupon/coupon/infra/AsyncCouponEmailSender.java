@@ -1,7 +1,7 @@
-package com.coupop.fcfscoupon.infra;
+package com.coupop.fcfscoupon.coupon.infra;
 
-import com.coupop.fcfscoupon.model.Coupon;
-import com.coupop.fcfscoupon.model.CouponEmailSender;
+import com.coupop.fcfscoupon.coupon.model.Coupon;
+import com.coupop.fcfscoupon.coupon.model.CouponEmailSender;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -10,16 +10,17 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CouponEmailSenderImpl implements CouponEmailSender {
+public class AsyncCouponEmailSender implements CouponEmailSender {
 
     private static final String SUBJECT = "쿠폰입니다.";
 
     private final JavaMailSender mailSender;
 
-    public CouponEmailSenderImpl(final JavaMailSender mailSender) {
+    public AsyncCouponEmailSender(final JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
 
+    @Async
     @Override
     public void send(final Coupon coupon, final String toAddress) {
         final MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -32,11 +33,6 @@ public class CouponEmailSenderImpl implements CouponEmailSender {
             throw new RuntimeException(e);
         }
 
-        sendMail(mimeMessage);
-    }
-
-    @Async
-    private void sendMail(final MimeMessage mimeMessage) {
         mailSender.send(mimeMessage);
     }
 }

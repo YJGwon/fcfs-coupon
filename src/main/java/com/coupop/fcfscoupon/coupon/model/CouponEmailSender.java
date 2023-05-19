@@ -1,4 +1,4 @@
-package com.coupop.fcfscoupon.model;
+package com.coupop.fcfscoupon.coupon.model;
 
 public interface CouponEmailSender {
 

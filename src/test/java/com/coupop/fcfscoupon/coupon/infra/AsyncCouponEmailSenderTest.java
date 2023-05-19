@@ -1,7 +1,7 @@
-package com.coupop.fcfscoupon.infra;
+package com.coupop.fcfscoupon.coupon.infra;
 
-import com.coupop.fcfscoupon.model.Coupon;
-import com.coupop.fcfscoupon.model.CouponEmailSender;
+import com.coupop.fcfscoupon.coupon.model.Coupon;
+import com.coupop.fcfscoupon.coupon.model.CouponEmailSender;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class CouponEmailSenderImplTest {
+class AsyncCouponEmailSenderTest {
 
     @Autowired
     private CouponEmailSender couponEmailSender;

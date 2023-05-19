@@ -1,4 +1,4 @@
-package com.coupop.fcfscoupon.infra;
+package com.coupop.fcfscoupon.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

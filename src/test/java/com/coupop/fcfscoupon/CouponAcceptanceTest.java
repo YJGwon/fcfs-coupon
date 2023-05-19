@@ -7,6 +7,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 import com.coupop.fcfscoupon.fcfsissue.dto.IssuanceRequest;
 import com.coupop.fcfscoupon.fcfsissue.model.FcfsIssuePolicy;
+import com.coupop.fcfscoupon.fcfsissue.support.RequestTime;
 import com.coupop.fcfscoupon.testconfig.DatabaseSetUp;
 import com.coupop.fcfscoupon.testconfig.MailSenderConfig;
 import io.restassured.RestAssured;
