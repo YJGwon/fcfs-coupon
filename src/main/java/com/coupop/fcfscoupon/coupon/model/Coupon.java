@@ -1,5 +1,8 @@
 package com.coupop.fcfscoupon.coupon.model;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document
 public class Coupon {
 
     private final String value;
