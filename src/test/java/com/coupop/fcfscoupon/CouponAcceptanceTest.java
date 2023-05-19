@@ -5,10 +5,9 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
-import com.coupop.fcfscoupon.dto.CouponRequest;
-import com.coupop.fcfscoupon.model.CouponIssuePolicy;
-import com.coupop.fcfscoupon.testconfig.DatabaseSetUp;
-import com.coupop.fcfscoupon.testconfig.MailSenderConfig;
+import com.coupop.fcfscoupon.fcfsissue.dto.IssuanceRequest;
+import com.coupop.fcfscoupon.fcfsissue.model.FcfsIssuePolicy;
+import com.coupop.fcfscoupon.testconfig.IntegrationTestConfig;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
@@ -18,41 +17,26 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.context.annotation.Import;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@Import(MailSenderConfig.class)
-public class CouponAcceptanceTest {
+public class CouponAcceptanceTest extends IntegrationTestConfig {
 
     @LocalServerPort
     private int port;
 
-
-    @Autowired
-    private DatabaseSetUp databaseSetUp;
-
-    @MockBean
-    private RequestTime requestTime;
-
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        databaseSetUp.clean();
-
-        given(requestTime.getValue())
-                .willReturn(CouponIssuePolicy.getOpenAt());
     }
 
     @DisplayName("쿠폰을 발급받는다.")
     @Test
     void issueCoupon() {
         // given
-        final CouponRequest request = new CouponRequest("foo@bar.com");
+        final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
 
         // when
         final ValidatableResponse response = post(request);
@@ -66,7 +50,7 @@ public class CouponAcceptanceTest {
     @ValueSource(strings = {"foobar.com", "foo@", "foo@com"})
     void issueCoupon_ifEmailInvalid(final String invalidEmail) {
         // given
-        final CouponRequest request = new CouponRequest(invalidEmail);
+        final IssuanceRequest request = new IssuanceRequest(invalidEmail);
 
         // when
         final ValidatableResponse response = post(request);
@@ -80,7 +64,7 @@ public class CouponAcceptanceTest {
     @Test
     void issueCoupon_ifCouponIsNotOpen() {
         // given
-        final CouponRequest request = new CouponRequest("foo@bar.com");
+        final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
 
         final LocalTime closedTime = LocalTime.of(9, 59);
         given(requestTime.getValue())
@@ -98,7 +82,7 @@ public class CouponAcceptanceTest {
     @Test
     void issueCoupon_ifCouponUsedToday() {
         // given
-        final CouponRequest request = new CouponRequest("foo@bar.com");
+        final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
         post(request);
 
         // when
@@ -113,9 +97,9 @@ public class CouponAcceptanceTest {
     @Test
     void issueCoupon_ifCouponOutOfStock() {
         // given
-        final CouponRequest request = new CouponRequest("foo@bar.com");
+        final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
 
-        databaseSetUp.setCount(CouponIssuePolicy.getLimit());
+        databaseSetUp.setCount(FcfsIssuePolicy.getLimit());
 
         // when
         final ValidatableResponse response = post(request);
@@ -125,7 +109,7 @@ public class CouponAcceptanceTest {
                 .body("title", equalTo("쿠폰이 모두 소진되었습니다."));
     }
 
-    private static ValidatableResponse post(final CouponRequest request) {
+    private ValidatableResponse post(final IssuanceRequest request) {
         return RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)

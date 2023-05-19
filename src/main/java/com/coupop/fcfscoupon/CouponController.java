@@ -1,7 +1,8 @@
 package com.coupop.fcfscoupon;
 
-import com.coupop.fcfscoupon.dto.CouponRequest;
-import com.coupop.fcfscoupon.execption.ApiException;
+import com.coupop.fcfscoupon.exception.ApiException;
+import com.coupop.fcfscoupon.fcfsissue.FcfsIssueService;
+import com.coupop.fcfscoupon.fcfsissue.dto.IssuanceRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
@@ -16,16 +17,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class CouponController {
 
-    private final CouponService couponService;
+    private final FcfsIssueService fcfsIssueService;
 
-    public CouponController(final CouponService couponService) {
-        this.couponService = couponService;
+    public CouponController(final FcfsIssueService fcfsIssueService) {
+        this.fcfsIssueService = fcfsIssueService;
     }
 
     @PostMapping("/issue")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void issue(@RequestBody @Validated final CouponRequest request) {
-        couponService.issue(request);
+    public void issue(@RequestBody @Validated final IssuanceRequest request) {
+        fcfsIssueService.issue(request);
     }
 
     @ExceptionHandler(ApiException.class)
