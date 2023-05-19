@@ -1,6 +1,7 @@
-package com.coupop.fcfscoupon.execption;
+package com.coupop.fcfscoupon.fcfsissue.exception;
 
-import com.coupop.fcfscoupon.model.FcfsIssuePolicy;
+import com.coupop.fcfscoupon.exception.ApiException;
+import com.coupop.fcfscoupon.fcfsissue.model.FcfsIssuePolicy;
 import org.springframework.http.HttpStatus;
 
 public class CouponOutOfStockException extends ApiException {

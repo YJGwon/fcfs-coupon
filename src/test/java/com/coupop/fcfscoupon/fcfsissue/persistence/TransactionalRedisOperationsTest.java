@@ -1,4 +1,4 @@
-package com.coupop.fcfscoupon.percistence;
+package com.coupop.fcfscoupon.fcfsissue.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

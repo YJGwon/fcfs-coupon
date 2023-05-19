@@ -1,4 +1,4 @@
-package com.coupop.fcfscoupon.execption;
+package com.coupop.fcfscoupon.exception;
 
 import java.net.URI;
 import org.springframework.http.HttpStatus;

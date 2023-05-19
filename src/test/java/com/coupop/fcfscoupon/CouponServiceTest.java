@@ -4,11 +4,11 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.BDDMockito.given;
 
-import com.coupop.fcfscoupon.dto.IssuanceRequest;
-import com.coupop.fcfscoupon.execption.CouponNotOpenedException;
-import com.coupop.fcfscoupon.execption.CouponOutOfStockException;
-import com.coupop.fcfscoupon.execption.EmailAlreadyUsedException;
-import com.coupop.fcfscoupon.model.FcfsIssuePolicy;
+import com.coupop.fcfscoupon.fcfsissue.dto.IssuanceRequest;
+import com.coupop.fcfscoupon.fcfsissue.exception.CouponNotOpenedException;
+import com.coupop.fcfscoupon.fcfsissue.exception.CouponOutOfStockException;
+import com.coupop.fcfscoupon.fcfsissue.exception.EmailAlreadyUsedException;
+import com.coupop.fcfscoupon.fcfsissue.model.FcfsIssuePolicy;
 import com.coupop.fcfscoupon.testconfig.DatabaseSetUp;
 import com.coupop.fcfscoupon.testconfig.MailSenderConfig;
 import java.time.LocalTime;

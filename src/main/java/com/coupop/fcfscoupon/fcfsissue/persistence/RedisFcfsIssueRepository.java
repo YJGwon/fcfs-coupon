@@ -1,6 +1,6 @@
-package com.coupop.fcfscoupon.percistence;
+package com.coupop.fcfscoupon.fcfsissue.persistence;
 
-import com.coupop.fcfscoupon.model.FcfsIssueRepository;
+import com.coupop.fcfscoupon.fcfsissue.model.FcfsIssueRepository;
 import java.time.LocalDate;
 import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;

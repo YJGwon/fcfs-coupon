@@ -1,4 +1,4 @@
-package com.coupop.fcfscoupon.model;
+package com.coupop.fcfscoupon.fcfsissue.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

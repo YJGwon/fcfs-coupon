@@ -1,4 +1,4 @@
-package com.coupop.fcfscoupon.dto;
+package com.coupop.fcfscoupon.fcfsissue.dto;
 
 import jakarta.validation.constraints.Email;
 

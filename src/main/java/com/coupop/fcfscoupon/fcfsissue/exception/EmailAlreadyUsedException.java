@@ -1,5 +1,6 @@
-package com.coupop.fcfscoupon.execption;
+package com.coupop.fcfscoupon.fcfsissue.exception;
 
+import com.coupop.fcfscoupon.exception.ApiException;
 import org.springframework.http.HttpStatus;
 
 public class EmailAlreadyUsedException extends ApiException {

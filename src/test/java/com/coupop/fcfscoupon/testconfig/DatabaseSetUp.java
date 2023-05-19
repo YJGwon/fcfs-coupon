@@ -1,6 +1,6 @@
 package com.coupop.fcfscoupon.testconfig;
 
-import com.coupop.fcfscoupon.model.FcfsIssueRepository;
+import com.coupop.fcfscoupon.fcfsissue.model.FcfsIssueRepository;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 

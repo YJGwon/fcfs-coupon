@@ -5,8 +5,8 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
-import com.coupop.fcfscoupon.dto.IssuanceRequest;
-import com.coupop.fcfscoupon.model.FcfsIssuePolicy;
+import com.coupop.fcfscoupon.fcfsissue.dto.IssuanceRequest;
+import com.coupop.fcfscoupon.fcfsissue.model.FcfsIssuePolicy;
 import com.coupop.fcfscoupon.testconfig.DatabaseSetUp;
 import com.coupop.fcfscoupon.testconfig.MailSenderConfig;
 import io.restassured.RestAssured;

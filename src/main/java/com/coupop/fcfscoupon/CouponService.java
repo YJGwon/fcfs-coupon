@@ -1,15 +1,15 @@
 package com.coupop.fcfscoupon;
 
-import com.coupop.fcfscoupon.dto.IssuanceRequest;
-import com.coupop.fcfscoupon.execption.CouponNotOpenedException;
-import com.coupop.fcfscoupon.execption.CouponOutOfStockException;
-import com.coupop.fcfscoupon.execption.EmailAlreadyUsedException;
+import com.coupop.fcfscoupon.fcfsissue.dto.IssuanceRequest;
+import com.coupop.fcfscoupon.fcfsissue.exception.CouponNotOpenedException;
+import com.coupop.fcfscoupon.fcfsissue.exception.CouponOutOfStockException;
+import com.coupop.fcfscoupon.fcfsissue.exception.EmailAlreadyUsedException;
+import com.coupop.fcfscoupon.fcfsissue.model.FcfsIssuePolicy;
+import com.coupop.fcfscoupon.fcfsissue.persistence.RedisFcfsIssueRepository;
+import com.coupop.fcfscoupon.fcfsissue.persistence.TransactionalRedisOperations;
 import com.coupop.fcfscoupon.model.Coupon;
 import com.coupop.fcfscoupon.model.CouponEmailSender;
-import com.coupop.fcfscoupon.model.FcfsIssuePolicy;
 import com.coupop.fcfscoupon.model.RandomCodeGenerator;
-import com.coupop.fcfscoupon.percistence.RedisFcfsIssueRepository;
-import com.coupop.fcfscoupon.percistence.TransactionalRedisOperations;
 import java.util.List;
 import org.springframework.stereotype.Service;
 

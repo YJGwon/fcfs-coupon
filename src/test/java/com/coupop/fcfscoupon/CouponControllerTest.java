@@ -7,10 +7,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.coupop.fcfscoupon.dto.IssuanceRequest;
-import com.coupop.fcfscoupon.execption.CouponNotOpenedException;
-import com.coupop.fcfscoupon.execption.CouponOutOfStockException;
-import com.coupop.fcfscoupon.execption.EmailAlreadyUsedException;
+import com.coupop.fcfscoupon.fcfsissue.dto.IssuanceRequest;
+import com.coupop.fcfscoupon.fcfsissue.exception.CouponNotOpenedException;
+import com.coupop.fcfscoupon.fcfsissue.exception.CouponOutOfStockException;
+import com.coupop.fcfscoupon.fcfsissue.exception.EmailAlreadyUsedException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
