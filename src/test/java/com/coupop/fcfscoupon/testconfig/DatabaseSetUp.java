@@ -10,21 +10,23 @@ public class DatabaseSetUp {
 
     private final StringRedisTemplate redisTemplate;
     private final FcfsIssueRepository fcfsIssueRepository;
-    private final MongoTemplate mongoTemplate;
+    private final MongoDatabaseCleaner mongoDatabaseCleaner;
 
     public DatabaseSetUp(final StringRedisTemplate redisTemplate,
                          final FcfsIssueRepository fcfsIssueRepository,
                          final MongoTemplate mongoTemplate) {
         this.redisTemplate = redisTemplate;
         this.fcfsIssueRepository = fcfsIssueRepository;
-        this.mongoTemplate = mongoTemplate;
+        this.mongoDatabaseCleaner = new MongoDatabaseCleaner(mongoTemplate);
     }
 
     public void clean() {
+        cleanRedis();
+        mongoDatabaseCleaner.clean();
+    }
+
+    public void cleanRedis() {
         redisTemplate.delete(redisTemplate.keys("*"));
-        for (String collectionName : mongoTemplate.getCollectionNames()) {
-            mongoTemplate.dropCollection(collectionName);
-        }
     }
 
     public void setCount(int count) {
