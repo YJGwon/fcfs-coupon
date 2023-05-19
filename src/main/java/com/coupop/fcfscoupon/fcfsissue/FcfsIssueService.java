@@ -1,8 +1,6 @@
-package com.coupop.fcfscoupon;
+package com.coupop.fcfscoupon.fcfsissue;
 
-import com.coupop.fcfscoupon.coupon.model.Coupon;
-import com.coupop.fcfscoupon.coupon.model.CouponEmailSender;
-import com.coupop.fcfscoupon.coupon.model.RandomCodeGenerator;
+import com.coupop.fcfscoupon.coupon.CouponService;
 import com.coupop.fcfscoupon.fcfsissue.dto.IssuanceRequest;
 import com.coupop.fcfscoupon.fcfsissue.exception.CouponNotOpenedException;
 import com.coupop.fcfscoupon.fcfsissue.exception.CouponOutOfStockException;
@@ -19,21 +17,18 @@ public class FcfsIssueService {
 
     private final RedisFcfsIssueRepository redisFcfsIssueRepository;
     private final TransactionalRedisOperations transactionalRedisOperations;
-
     private final RequestTime requestTime;
-    private final RandomCodeGenerator codeGenerator;
-    private final CouponEmailSender couponEmailSender;
+
+    private final CouponService couponService;
 
     public FcfsIssueService(final RedisFcfsIssueRepository redisFcfsIssueRepository,
                             final TransactionalRedisOperations transactionalRedisOperations,
                             final RequestTime requestTime,
-                            final RandomCodeGenerator codeGenerator,
-                            final CouponEmailSender couponEmailSender) {
+                            final CouponService couponService) {
         this.redisFcfsIssueRepository = redisFcfsIssueRepository;
         this.transactionalRedisOperations = transactionalRedisOperations;
         this.requestTime = requestTime;
-        this.codeGenerator = codeGenerator;
-        this.couponEmailSender = couponEmailSender;
+        this.couponService = couponService;
     }
 
     public void issue(final IssuanceRequest request) {
@@ -41,8 +36,7 @@ public class FcfsIssueService {
         final String email = request.email();
         final Long sequence = checkIssuableAndGetSequence(email);
 
-        final Coupon coupon = new Coupon(codeGenerator.generate(sequence));
-        couponEmailSender.send(coupon, email);
+        couponService.createAndSend(sequence, email);
     }
 
     private Long checkIssuableAndGetSequence(final String email) {

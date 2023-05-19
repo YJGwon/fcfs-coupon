@@ -1,4 +1,4 @@
-package com.coupop.fcfscoupon;
+package com.coupop.fcfscoupon.fcfsissue;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNoException;

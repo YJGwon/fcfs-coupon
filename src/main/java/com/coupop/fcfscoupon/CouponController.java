@@ -1,6 +1,7 @@
 package com.coupop.fcfscoupon;
 
 import com.coupop.fcfscoupon.exception.ApiException;
+import com.coupop.fcfscoupon.fcfsissue.FcfsIssueService;
 import com.coupop.fcfscoupon.fcfsissue.dto.IssuanceRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;

@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.coupop.fcfscoupon.fcfsissue.FcfsIssueService;
 import com.coupop.fcfscoupon.fcfsissue.dto.IssuanceRequest;
 import com.coupop.fcfscoupon.fcfsissue.exception.CouponNotOpenedException;
 import com.coupop.fcfscoupon.fcfsissue.exception.CouponOutOfStockException;
