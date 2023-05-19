@@ -2,7 +2,7 @@ package com.coupop.fcfscoupon.model;
 
 import java.time.LocalTime;
 
-public class CouponIssuePolicy {
+public class FcfsIssuePolicy {
 
     private static final LocalTime OPEN_AT = LocalTime.of(10, 0);
 

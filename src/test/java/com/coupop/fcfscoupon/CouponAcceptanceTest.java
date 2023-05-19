@@ -5,8 +5,8 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
-import com.coupop.fcfscoupon.dto.CouponRequest;
-import com.coupop.fcfscoupon.model.CouponIssuePolicy;
+import com.coupop.fcfscoupon.dto.IssuanceRequest;
+import com.coupop.fcfscoupon.model.FcfsIssuePolicy;
 import com.coupop.fcfscoupon.testconfig.DatabaseSetUp;
 import com.coupop.fcfscoupon.testconfig.MailSenderConfig;
 import io.restassured.RestAssured;
@@ -32,7 +32,6 @@ public class CouponAcceptanceTest {
     @LocalServerPort
     private int port;
 
-
     @Autowired
     private DatabaseSetUp databaseSetUp;
 
@@ -45,14 +44,14 @@ public class CouponAcceptanceTest {
         databaseSetUp.clean();
 
         given(requestTime.getValue())
-                .willReturn(CouponIssuePolicy.getOpenAt());
+                .willReturn(FcfsIssuePolicy.getOpenAt());
     }
 
     @DisplayName("쿠폰을 발급받는다.")
     @Test
     void issueCoupon() {
         // given
-        final CouponRequest request = new CouponRequest("foo@bar.com");
+        final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
 
         // when
         final ValidatableResponse response = post(request);
@@ -66,7 +65,7 @@ public class CouponAcceptanceTest {
     @ValueSource(strings = {"foobar.com", "foo@", "foo@com"})
     void issueCoupon_ifEmailInvalid(final String invalidEmail) {
         // given
-        final CouponRequest request = new CouponRequest(invalidEmail);
+        final IssuanceRequest request = new IssuanceRequest(invalidEmail);
 
         // when
         final ValidatableResponse response = post(request);
@@ -80,7 +79,7 @@ public class CouponAcceptanceTest {
     @Test
     void issueCoupon_ifCouponIsNotOpen() {
         // given
-        final CouponRequest request = new CouponRequest("foo@bar.com");
+        final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
 
         final LocalTime closedTime = LocalTime.of(9, 59);
         given(requestTime.getValue())
@@ -98,7 +97,7 @@ public class CouponAcceptanceTest {
     @Test
     void issueCoupon_ifCouponUsedToday() {
         // given
-        final CouponRequest request = new CouponRequest("foo@bar.com");
+        final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
         post(request);
 
         // when
@@ -113,9 +112,9 @@ public class CouponAcceptanceTest {
     @Test
     void issueCoupon_ifCouponOutOfStock() {
         // given
-        final CouponRequest request = new CouponRequest("foo@bar.com");
+        final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
 
-        databaseSetUp.setCount(CouponIssuePolicy.getLimit());
+        databaseSetUp.setCount(FcfsIssuePolicy.getLimit());
 
         // when
         final ValidatableResponse response = post(request);
@@ -125,7 +124,7 @@ public class CouponAcceptanceTest {
                 .body("title", equalTo("쿠폰이 모두 소진되었습니다."));
     }
 
-    private static ValidatableResponse post(final CouponRequest request) {
+    private ValidatableResponse post(final IssuanceRequest request) {
         return RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)

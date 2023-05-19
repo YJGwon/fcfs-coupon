@@ -1,19 +1,19 @@
 package com.coupop.fcfscoupon.percistence;
 
-import com.coupop.fcfscoupon.model.CouponIssuanceRepository;
+import com.coupop.fcfscoupon.model.FcfsIssueRepository;
 import java.time.LocalDate;
 import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class RedisCouponIssuanceRepository implements CouponIssuanceRepository {
+public class RedisFcfsIssueRepository implements FcfsIssueRepository {
 
     private static final String PATTERN_KEY = "coupon:%s";
 
     private final StringRedisTemplate stringRedisTemplate;
 
-    public RedisCouponIssuanceRepository(final StringRedisTemplate stringRedisTemplate) {
+    public RedisFcfsIssueRepository(final StringRedisTemplate stringRedisTemplate) {
         this.stringRedisTemplate = stringRedisTemplate;
     }
 

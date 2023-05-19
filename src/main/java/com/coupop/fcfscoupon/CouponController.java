@@ -1,6 +1,6 @@
 package com.coupop.fcfscoupon;
 
-import com.coupop.fcfscoupon.dto.CouponRequest;
+import com.coupop.fcfscoupon.dto.IssuanceRequest;
 import com.coupop.fcfscoupon.execption.ApiException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
@@ -24,7 +24,7 @@ public class CouponController {
 
     @PostMapping("/issue")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void issue(@RequestBody @Validated final CouponRequest request) {
+    public void issue(@RequestBody @Validated final IssuanceRequest request) {
         couponService.issue(request);
     }
 

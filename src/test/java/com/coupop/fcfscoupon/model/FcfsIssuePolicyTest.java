@@ -7,7 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-class CouponIssuePolicyTest {
+class FcfsIssuePolicyTest {
 
     @DisplayName("쿠폰이 닫힌 시각인지 확인한다.")
     @ParameterizedTest
@@ -17,7 +17,7 @@ class CouponIssuePolicyTest {
         final LocalTime time = LocalTime.of(hour, minute);
 
         // when
-        final boolean actual = CouponIssuePolicy.isCouponClosed(time);
+        final boolean actual = FcfsIssuePolicy.isCouponClosed(time);
 
         // then
         assertThat(actual).isEqualTo(expected);

@@ -4,11 +4,11 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.BDDMockito.given;
 
-import com.coupop.fcfscoupon.dto.CouponRequest;
+import com.coupop.fcfscoupon.dto.IssuanceRequest;
 import com.coupop.fcfscoupon.execption.CouponNotOpenedException;
 import com.coupop.fcfscoupon.execption.CouponOutOfStockException;
 import com.coupop.fcfscoupon.execption.EmailAlreadyUsedException;
-import com.coupop.fcfscoupon.model.CouponIssuePolicy;
+import com.coupop.fcfscoupon.model.FcfsIssuePolicy;
 import com.coupop.fcfscoupon.testconfig.DatabaseSetUp;
 import com.coupop.fcfscoupon.testconfig.MailSenderConfig;
 import java.time.LocalTime;
@@ -38,14 +38,14 @@ class CouponServiceTest {
         databaseSetUp.clean();
 
         given(requestTime.getValue())
-                .willReturn(CouponIssuePolicy.getOpenAt());
+                .willReturn(FcfsIssuePolicy.getOpenAt());
     }
 
     @DisplayName("쿠폰을 발급한다.")
     @Test
     void issue() {
         // given
-        final CouponRequest request = new CouponRequest("foo@bar.com");
+        final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
 
         // when & then
         assertThatNoException()
@@ -56,7 +56,7 @@ class CouponServiceTest {
     @Test
     void issue_throwsException_ifCouponIsNotOpen() {
         // given
-        final CouponRequest request = new CouponRequest("foo@bar.com");
+        final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
 
         final LocalTime closedTime = LocalTime.of(9, 59);
         given(requestTime.getValue())
@@ -71,7 +71,7 @@ class CouponServiceTest {
     @Test
     void issue_throwsException_ifEmailUsedToday() {
         // given
-        final CouponRequest request = new CouponRequest("foo@bar.com");
+        final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
 
         couponService.issue(request);
 
@@ -84,9 +84,9 @@ class CouponServiceTest {
     @Test
     void issue_throwsException_ifCouponOutOfStock() {
         // given
-        final CouponRequest request = new CouponRequest("foo@bar.com");
+        final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
 
-        databaseSetUp.setCount(CouponIssuePolicy.getLimit());
+        databaseSetUp.setCount(FcfsIssuePolicy.getLimit());
 
         // when & then
         assertThatExceptionOfType(CouponOutOfStockException.class)

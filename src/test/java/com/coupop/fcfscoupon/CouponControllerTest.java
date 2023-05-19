@@ -7,7 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.coupop.fcfscoupon.dto.CouponRequest;
+import com.coupop.fcfscoupon.dto.IssuanceRequest;
 import com.coupop.fcfscoupon.execption.CouponNotOpenedException;
 import com.coupop.fcfscoupon.execption.CouponOutOfStockException;
 import com.coupop.fcfscoupon.execption.EmailAlreadyUsedException;
@@ -39,7 +39,7 @@ class CouponControllerTest {
     @Test
     void issue() throws Exception {
         // given
-        final CouponRequest request = new CouponRequest("foo@bar.com");
+        final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
 
         // when
         final ResultActions resultActions = mockMvc.perform(post("/issue")
@@ -57,7 +57,7 @@ class CouponControllerTest {
     @ValueSource(strings = {"foobar.com", "foo@", "foo@com"})
     void issue_responseError_ifEmailInvalid(final String invalidEmail) throws Exception {
         // given
-        final CouponRequest request = new CouponRequest(invalidEmail);
+        final IssuanceRequest request = new IssuanceRequest(invalidEmail);
 
         // when
         final ResultActions resultActions = mockMvc.perform(post("/issue")
@@ -76,10 +76,10 @@ class CouponControllerTest {
     void issue_responseError_ifEmailUsedToday() throws Exception {
         // given
         final String email = "foo@bar.com";
-        final CouponRequest request = new CouponRequest(email);
+        final IssuanceRequest request = new IssuanceRequest(email);
 
         doThrow(new EmailAlreadyUsedException(email))
-                .when(couponService).issue(any(CouponRequest.class));
+                .when(couponService).issue(any(IssuanceRequest.class));
 
         // when
         final ResultActions resultActions = mockMvc.perform(post("/issue")
@@ -97,10 +97,10 @@ class CouponControllerTest {
     @Test
     void issue_responseError_ifCouponIsNotOpen() throws Exception {
         // given
-        final CouponRequest request = new CouponRequest("foo@bar.com");
+        final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
 
         doThrow(new CouponNotOpenedException())
-                .when(couponService).issue(any(CouponRequest.class));
+                .when(couponService).issue(any(IssuanceRequest.class));
 
         // when
         final ResultActions resultActions = mockMvc.perform(post("/issue")
@@ -118,10 +118,10 @@ class CouponControllerTest {
     @Test
     void issue_responseError_ifCouponOutOfStock() throws Exception {
         // given
-        final CouponRequest request = new CouponRequest("foo@bar.com");
+        final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
 
         doThrow(new CouponOutOfStockException())
-                .when(couponService).issue(any(CouponRequest.class));
+                .when(couponService).issue(any(IssuanceRequest.class));
 
         // when
         final ResultActions resultActions = mockMvc.perform(post("/issue")

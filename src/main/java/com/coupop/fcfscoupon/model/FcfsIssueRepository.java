@@ -1,6 +1,6 @@
 package com.coupop.fcfscoupon.model;
 
-public interface CouponIssuanceRepository {
+public interface FcfsIssueRepository {
 
     Long add(final String email);
 

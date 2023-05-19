@@ -1,6 +1,6 @@
 package com.coupop.fcfscoupon.testconfig;
 
-import com.coupop.fcfscoupon.model.CouponIssuanceRepository;
+import com.coupop.fcfscoupon.model.FcfsIssueRepository;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -8,12 +8,12 @@ import org.springframework.stereotype.Component;
 public class DatabaseSetUp {
 
     private final StringRedisTemplate redisTemplate;
-    private final CouponIssuanceRepository couponIssuanceRepository;
+    private final FcfsIssueRepository fcfsIssueRepository;
 
     public DatabaseSetUp(final StringRedisTemplate redisTemplate,
-                         final CouponIssuanceRepository couponIssuanceRepository) {
+                         final FcfsIssueRepository fcfsIssueRepository) {
         this.redisTemplate = redisTemplate;
-        this.couponIssuanceRepository = couponIssuanceRepository;
+        this.fcfsIssueRepository = fcfsIssueRepository;
     }
 
     public void clean() {
@@ -22,7 +22,7 @@ public class DatabaseSetUp {
 
     public void setCount(int count) {
         for (int i = 0; i < count; i++) {
-            couponIssuanceRepository.add(String.format("foo%d@bar.com", i));
+            fcfsIssueRepository.add(String.format("foo%d@bar.com", i));
         }
     }
 }
