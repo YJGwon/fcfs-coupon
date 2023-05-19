@@ -33,7 +33,7 @@ class CouponControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private CouponService couponService;
+    private FcfsIssueService fcfsIssueService;
 
     @DisplayName("쿠폰 발행에 성공하면 쿠폰 내용과 함께 Accepted 상태를 반환한다.")
     @Test
@@ -79,7 +79,7 @@ class CouponControllerTest {
         final IssuanceRequest request = new IssuanceRequest(email);
 
         doThrow(new EmailAlreadyUsedException(email))
-                .when(couponService).issue(any(IssuanceRequest.class));
+                .when(fcfsIssueService).issue(any(IssuanceRequest.class));
 
         // when
         final ResultActions resultActions = mockMvc.perform(post("/issue")
@@ -100,7 +100,7 @@ class CouponControllerTest {
         final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
 
         doThrow(new CouponNotOpenedException())
-                .when(couponService).issue(any(IssuanceRequest.class));
+                .when(fcfsIssueService).issue(any(IssuanceRequest.class));
 
         // when
         final ResultActions resultActions = mockMvc.perform(post("/issue")
@@ -121,7 +121,7 @@ class CouponControllerTest {
         final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
 
         doThrow(new CouponOutOfStockException())
-                .when(couponService).issue(any(IssuanceRequest.class));
+                .when(fcfsIssueService).issue(any(IssuanceRequest.class));
 
         // when
         final ResultActions resultActions = mockMvc.perform(post("/issue")

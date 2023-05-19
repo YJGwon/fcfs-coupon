@@ -23,10 +23,10 @@ import org.springframework.context.annotation.Import;
 
 @SpringBootTest
 @Import(MailSenderConfig.class)
-class CouponServiceTest {
+class FcfsIssueServiceTest {
 
     @Autowired
-    private CouponService couponService;
+    private FcfsIssueService fcfsIssueService;
 
     @Autowired
     private DatabaseSetUp databaseSetUp;
@@ -50,7 +50,7 @@ class CouponServiceTest {
 
         // when & then
         assertThatNoException()
-                .isThrownBy(() -> couponService.issue(request));
+                .isThrownBy(() -> fcfsIssueService.issue(request));
     }
 
     @DisplayName("쿠폰을 발급할 때 쿠폰이 열려있지 않으면 예외가 발생한다.")
@@ -65,7 +65,7 @@ class CouponServiceTest {
 
         // when & then
         assertThatExceptionOfType(CouponNotOpenedException.class)
-                .isThrownBy(() -> couponService.issue(request));
+                .isThrownBy(() -> fcfsIssueService.issue(request));
     }
 
     @DisplayName("쿠폰을 발급할 때 당일에 이미 사용된 이메일이면 예외가 발생한다.")
@@ -74,11 +74,11 @@ class CouponServiceTest {
         // given
         final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
 
-        couponService.issue(request);
+        fcfsIssueService.issue(request);
 
         // when & then
         assertThatExceptionOfType(EmailAlreadyUsedException.class)
-                .isThrownBy(() -> couponService.issue(request));
+                .isThrownBy(() -> fcfsIssueService.issue(request));
     }
 
     @DisplayName("쿠폰을 발급할 때 쿠폰이 소진되면 예외가 발생한다.")
@@ -91,6 +91,6 @@ class CouponServiceTest {
 
         // when & then
         assertThatExceptionOfType(CouponOutOfStockException.class)
-                .isThrownBy(() -> couponService.issue(request));
+                .isThrownBy(() -> fcfsIssueService.issue(request));
     }
 }

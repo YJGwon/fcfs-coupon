@@ -15,7 +15,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CouponService {
+public class FcfsIssueService {
 
     private final RedisFcfsIssueRepository redisFcfsIssueRepository;
     private final TransactionalRedisOperations transactionalRedisOperations;
@@ -24,11 +24,11 @@ public class CouponService {
     private final RandomCodeGenerator codeGenerator;
     private final CouponEmailSender couponEmailSender;
 
-    public CouponService(final RedisFcfsIssueRepository redisFcfsIssueRepository,
-                         final TransactionalRedisOperations transactionalRedisOperations,
-                         final RequestTime requestTime,
-                         final RandomCodeGenerator codeGenerator,
-                         final CouponEmailSender couponEmailSender) {
+    public FcfsIssueService(final RedisFcfsIssueRepository redisFcfsIssueRepository,
+                            final TransactionalRedisOperations transactionalRedisOperations,
+                            final RequestTime requestTime,
+                            final RandomCodeGenerator codeGenerator,
+                            final CouponEmailSender couponEmailSender) {
         this.redisFcfsIssueRepository = redisFcfsIssueRepository;
         this.transactionalRedisOperations = transactionalRedisOperations;
         this.requestTime = requestTime;

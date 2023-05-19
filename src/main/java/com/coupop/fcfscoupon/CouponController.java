@@ -16,16 +16,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class CouponController {
 
-    private final CouponService couponService;
+    private final FcfsIssueService fcfsIssueService;
 
-    public CouponController(final CouponService couponService) {
-        this.couponService = couponService;
+    public CouponController(final FcfsIssueService fcfsIssueService) {
+        this.fcfsIssueService = fcfsIssueService;
     }
 
     @PostMapping("/issue")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void issue(@RequestBody @Validated final IssuanceRequest request) {
-        couponService.issue(request);
+        fcfsIssueService.issue(request);
     }
 
     @ExceptionHandler(ApiException.class)
