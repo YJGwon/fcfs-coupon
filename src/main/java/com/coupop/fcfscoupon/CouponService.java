@@ -18,26 +18,33 @@ public class CouponService {
 
     private final RedisCouponIssuanceRepository couponIssuanceRepository;
     private final TransactionalRedisOperations transactionalRedisOperations;
-    private final CouponEmailSender couponEmailSender;
 
     private final RequestTime requestTime;
     private final RandomCodeGenerator codeGenerator;
+    private final CouponEmailSender couponEmailSender;
 
     public CouponService(final RedisCouponIssuanceRepository couponIssuanceRepository,
                          final TransactionalRedisOperations transactionalRedisOperations,
-                         final CouponEmailSender couponEmailSender,
                          final RequestTime requestTime,
-                         final RandomCodeGenerator codeGenerator) {
+                         final RandomCodeGenerator codeGenerator,
+                         final CouponEmailSender couponEmailSender) {
         this.couponIssuanceRepository = couponIssuanceRepository;
         this.transactionalRedisOperations = transactionalRedisOperations;
-        this.couponEmailSender = couponEmailSender;
         this.requestTime = requestTime;
         this.codeGenerator = codeGenerator;
+        this.couponEmailSender = couponEmailSender;
     }
 
     public void issue(final CouponRequest request) {
         checkCouponOpen();
         final String email = request.email();
+        final Long sequence = checkIssuableAndGetSequence(email);
+
+        final Coupon coupon = new Coupon(codeGenerator.generate(sequence));
+        couponEmailSender.send(coupon, email);
+    }
+
+    private Long checkIssuableAndGetSequence(final String email) {
         final List<Object> result = transactionalRedisOperations.startSession()
                 .multi()
                 .andThen(ops -> couponIssuanceRepository.getCount(ops.opsForSet()))
@@ -49,9 +56,7 @@ public class CouponService {
 
         final Long addResult = (Long) result.get(1);
         checkEmailNotUsedToday(addResult, email);
-
-        final Coupon coupon = new Coupon(codeGenerator.generate(count));
-        couponEmailSender.send(coupon, email);
+        return count;
     }
 
     private void checkCouponOpen() {
