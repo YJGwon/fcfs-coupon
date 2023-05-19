@@ -9,38 +9,18 @@ import com.coupop.fcfscoupon.fcfsissue.exception.CouponNotOpenedException;
 import com.coupop.fcfscoupon.fcfsissue.exception.CouponOutOfStockException;
 import com.coupop.fcfscoupon.fcfsissue.exception.EmailAlreadyUsedException;
 import com.coupop.fcfscoupon.fcfsissue.model.FcfsIssuePolicy;
-import com.coupop.fcfscoupon.fcfsissue.support.RequestTime;
-import com.coupop.fcfscoupon.testconfig.DatabaseSetUp;
-import com.coupop.fcfscoupon.testconfig.MailSenderConfig;
+import com.coupop.fcfscoupon.testconfig.IntegrationTestConfig;
 import java.time.LocalTime;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 
 @SpringBootTest
-@Import(MailSenderConfig.class)
-class FcfsIssueServiceTest {
+class FcfsIssueServiceTest extends IntegrationTestConfig {
 
     @Autowired
     private FcfsIssueService fcfsIssueService;
-
-    @Autowired
-    private DatabaseSetUp databaseSetUp;
-
-    @MockBean
-    private RequestTime requestTime;
-
-    @BeforeEach
-    void setUp() {
-        databaseSetUp.clean();
-
-        given(requestTime.getValue())
-                .willReturn(FcfsIssuePolicy.getOpenAt());
-    }
 
     @DisplayName("쿠폰을 발급한다.")
     @Test
