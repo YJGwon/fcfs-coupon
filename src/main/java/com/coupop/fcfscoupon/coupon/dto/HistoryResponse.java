@@ -5,7 +5,7 @@ import java.util.List;
 
 public record HistoryResponse(List<IssuedCouponResponse> issuedCoupons) {
 
-    public static HistoryResponse of(CouponIssueHistory history) {
+    public static HistoryResponse of(final CouponIssueHistory history) {
         List<IssuedCouponResponse> issuedCoupons = history.getIssuedCoupons().stream()
                 .map(IssuedCouponResponse::of)
                 .toList();

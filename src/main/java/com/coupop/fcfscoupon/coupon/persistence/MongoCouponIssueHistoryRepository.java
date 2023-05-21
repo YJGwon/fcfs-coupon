@@ -7,6 +7,7 @@ import com.coupop.fcfscoupon.coupon.model.CouponIssueHistory;
 import com.coupop.fcfscoupon.coupon.model.CouponIssueHistoryDetail;
 import com.coupop.fcfscoupon.coupon.model.CouponIssueHistoryRepository;
 import com.mongodb.client.result.UpdateResult;
+import java.util.Optional;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
@@ -30,7 +31,9 @@ public class MongoCouponIssueHistoryRepository implements CouponIssueHistoryRepo
     }
 
     @Override
-    public CouponIssueHistory findByEmail(final String email) {
-        return mongoTemplate.findOne(query(where("email").is(email)), CouponIssueHistory.class);
+    public Optional<CouponIssueHistory> findByEmail(final String email) {
+        final CouponIssueHistory found = mongoTemplate
+                .findOne(query(where("email").is(email)), CouponIssueHistory.class);
+        return Optional.ofNullable(found);
     }
 }

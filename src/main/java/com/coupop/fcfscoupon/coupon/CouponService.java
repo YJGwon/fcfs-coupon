@@ -10,6 +10,7 @@ import com.coupop.fcfscoupon.coupon.model.CouponIssueHistoryDetail;
 import com.coupop.fcfscoupon.coupon.model.CouponIssueHistoryRepository;
 import com.coupop.fcfscoupon.coupon.model.CouponRepository;
 import com.coupop.fcfscoupon.coupon.model.RandomCodeGenerator;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -40,10 +41,10 @@ public class CouponService {
 
     public HistoryResponse findHistoryByEmail(final HistoryRequest request) {
         final String email = request.email();
-        final CouponIssueHistory history = couponIssueHistoryRepository.findByEmail(email);
-        if (history == null) {
+        final Optional<CouponIssueHistory> history = couponIssueHistoryRepository.findByEmail(email);
+        if (history.isEmpty()) {
             throw new HistoryNotFoundException(email);
         }
-        return HistoryResponse.of(history);
+        return HistoryResponse.of(history.get());
     }
 }
