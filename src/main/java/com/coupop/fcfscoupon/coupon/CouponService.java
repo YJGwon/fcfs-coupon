@@ -6,11 +6,10 @@ import com.coupop.fcfscoupon.coupon.exception.HistoryNotFoundException;
 import com.coupop.fcfscoupon.coupon.model.Coupon;
 import com.coupop.fcfscoupon.coupon.model.CouponEmailSender;
 import com.coupop.fcfscoupon.coupon.model.CouponIssueHistory;
-import com.coupop.fcfscoupon.coupon.model.CouponIssueHistoryDetail;
 import com.coupop.fcfscoupon.coupon.model.CouponIssueHistoryRepository;
 import com.coupop.fcfscoupon.coupon.model.CouponRepository;
 import com.coupop.fcfscoupon.coupon.model.RandomCodeGenerator;
-import java.util.Optional;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -35,16 +34,16 @@ public class CouponService {
     public void createAndSend(final Long sequence, final String email) {
         final Coupon coupon = new Coupon(codeGenerator.generate(sequence));
         couponRepository.save(coupon);
-        couponIssueHistoryRepository.save(email, CouponIssueHistoryDetail.ofNew(coupon));
+        couponIssueHistoryRepository.save(CouponIssueHistory.ofNew(email, coupon));
         couponEmailSender.send(coupon, email);
     }
 
     public HistoryResponse findHistoryByEmail(final HistoryRequest request) {
         final String email = request.email();
-        final Optional<CouponIssueHistory> history = couponIssueHistoryRepository.findByEmail(email);
-        if (history.isEmpty()) {
-            throw new HistoryNotFoundException(email);
+        final List<CouponIssueHistory> historyList = couponIssueHistoryRepository.findByEmail(email);
+        if (historyList.isEmpty()) {
+            throw HistoryNotFoundException.ofEmail(email);
         }
-        return HistoryResponse.of(history.get());
+        return HistoryResponse.of(historyList);
     }
 }

@@ -1,26 +1,38 @@
 package com.coupop.fcfscoupon.coupon.model;
 
-import java.util.List;
+import java.time.LocalDate;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
 public class CouponIssueHistory {
 
     private final String email;
+    private final Coupon coupon;
+    private final LocalDate createdAt;
 
-    private final List<CouponIssueHistoryDetail> issuedCoupons;
+    @Id
+    private String id;
 
-    public CouponIssueHistory(final String email,
-                              final List<CouponIssueHistoryDetail> issuedCoupons) {
+    private CouponIssueHistory(final String email, final Coupon coupon, final LocalDate createdAt) {
         this.email = email;
-        this.issuedCoupons = issuedCoupons;
+        this.coupon = coupon;
+        this.createdAt = createdAt;
+    }
+
+    public static CouponIssueHistory ofNew(final String email, final Coupon coupon) {
+        return new CouponIssueHistory(email, coupon, LocalDate.now());
     }
 
     public String getEmail() {
         return email;
     }
 
-    public List<CouponIssueHistoryDetail> getIssuedCoupons() {
-        return issuedCoupons;
+    public Coupon getCoupon() {
+        return coupon;
+    }
+
+    public String getCreatedAt() {
+        return createdAt.toString();
     }
 }

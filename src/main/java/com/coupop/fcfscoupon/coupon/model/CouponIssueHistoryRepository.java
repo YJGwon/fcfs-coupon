@@ -1,10 +1,13 @@
 package com.coupop.fcfscoupon.coupon.model;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface CouponIssueHistoryRepository {
 
-    long save(final String email, final CouponIssueHistoryDetail detail);
+    CouponIssueHistory save(final CouponIssueHistory detail);
 
-    Optional<CouponIssueHistory> findByEmail(final String email);
+    List<CouponIssueHistory> findByEmail(final String email);
+
+    Optional<CouponIssueHistory> findById(final String id);
 }
