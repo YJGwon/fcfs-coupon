@@ -1,7 +1,10 @@
 package com.coupop.fcfscoupon.coupon;
 
+import com.coupop.fcfscoupon.coupon.dto.HistoryRequest;
+import com.coupop.fcfscoupon.coupon.dto.HistoryResponse;
 import com.coupop.fcfscoupon.coupon.model.Coupon;
 import com.coupop.fcfscoupon.coupon.model.CouponEmailSender;
+import com.coupop.fcfscoupon.coupon.model.CouponIssueHistory;
 import com.coupop.fcfscoupon.coupon.model.CouponIssueHistoryDetail;
 import com.coupop.fcfscoupon.coupon.model.CouponIssueHistoryRepository;
 import com.coupop.fcfscoupon.coupon.model.CouponRepository;
@@ -32,5 +35,10 @@ public class CouponService {
         couponRepository.save(coupon);
         couponIssueHistoryRepository.save(email, CouponIssueHistoryDetail.ofNew(coupon));
         couponEmailSender.send(coupon, email);
+    }
+
+    public HistoryResponse findHistoryByEmail(final HistoryRequest request) {
+        CouponIssueHistory history = couponIssueHistoryRepository.findByEmail(request.email());
+        return HistoryResponse.of(history);
     }
 }

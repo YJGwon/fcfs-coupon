@@ -8,9 +8,12 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
+import com.coupop.fcfscoupon.coupon.dto.HistoryRequest;
+import com.coupop.fcfscoupon.coupon.dto.HistoryResponse;
 import com.coupop.fcfscoupon.coupon.model.Coupon;
 import com.coupop.fcfscoupon.coupon.model.CouponIssueHistory;
 import com.coupop.fcfscoupon.testconfig.IntegrationTestConfig;
+import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,5 +48,21 @@ class CouponServiceTest extends IntegrationTestConfig {
                 () -> assertThat(savedHistory).isNotNull(),
                 () -> verify(couponEmailSender).send(any(Coupon.class), eq(email))
         );
+    }
+
+    @DisplayName("이메일로 쿠폰 발급 이력을 조회하여 응답한다.")
+    @Test
+    void findHistoryByEmail() {
+        // given
+        final String email = "yj970125@gmail.com";
+        couponService.createAndSend(1L, email);
+        final HistoryRequest request = new HistoryRequest(email);
+
+        // when
+        final HistoryResponse response = couponService.findHistoryByEmail(request);
+
+        // then
+        assertThat(response.issuedCoupons()).hasSize(1);
+        assertThat(response.issuedCoupons().get(0).date()).isEqualTo(LocalDate.now().toString());
     }
 }

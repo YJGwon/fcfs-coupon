@@ -1,18 +1,26 @@
 package com.coupop.fcfscoupon;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.coupop.fcfscoupon.coupon.CouponService;
+import com.coupop.fcfscoupon.coupon.dto.HistoryRequest;
+import com.coupop.fcfscoupon.coupon.dto.HistoryResponse;
+import com.coupop.fcfscoupon.coupon.dto.IssuedCouponResponse;
 import com.coupop.fcfscoupon.fcfsissue.FcfsIssueService;
 import com.coupop.fcfscoupon.fcfsissue.dto.IssuanceRequest;
 import com.coupop.fcfscoupon.fcfsissue.exception.CouponNotOpenedException;
 import com.coupop.fcfscoupon.fcfsissue.exception.CouponOutOfStockException;
 import com.coupop.fcfscoupon.fcfsissue.exception.EmailAlreadyUsedException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -35,6 +43,9 @@ class CouponControllerTest {
 
     @MockBean
     private FcfsIssueService fcfsIssueService;
+
+    @MockBean
+    private CouponService couponService;
 
     @DisplayName("쿠폰 발행에 성공하면 Accepted 상태를 반환한다.")
     @Test
@@ -119,6 +130,36 @@ class CouponControllerTest {
         resultActions
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("title").value("쿠폰이 모두 소진되었습니다."));
+    }
+
+    @DisplayName("이메일에 대한 쿠폰 발급 이력 조회에 성공하면 발급된 쿠폰 목록과 함께 OK 상태를 반환한다.")
+    @Test
+    void findHistoryByEmail() throws Exception {
+        // given
+        final String email = "foo@bar.com";
+        final HistoryRequest request = new HistoryRequest(email);
+        final HistoryResponse response = new HistoryResponse(
+                List.of(new IssuedCouponResponse("fakeid", "2023-05-21")));
+
+        given(couponService.findHistoryByEmail(any(HistoryRequest.class)))
+                .willReturn(response);
+        // when
+        final ResultActions resultActions = performGet("/history", request);
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.issuedCoupons", hasSize(1)))
+                .andExpect(jsonPath("$.issuedCoupons[*].id").value("fakeid"))
+                .andExpect(jsonPath("$.issuedCoupons[*].date").value("2023-05-21"));
+    }
+
+    private ResultActions performGet(final String url, final Object request) throws Exception {
+        return mockMvc.perform(get(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print());
     }
 
     private ResultActions performPost(final String url, final Object request) throws Exception {

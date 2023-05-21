@@ -28,4 +28,9 @@ public class MongoCouponIssueHistoryRepository implements CouponIssueHistoryRepo
                 .upsert();
         return result.getModifiedCount();
     }
+
+    @Override
+    public CouponIssueHistory findByEmail(final String email) {
+        return mongoTemplate.findOne(query(where("email").is(email)), CouponIssueHistory.class);
+    }
 }
