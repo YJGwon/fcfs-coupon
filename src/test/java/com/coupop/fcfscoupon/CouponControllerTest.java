@@ -36,17 +36,14 @@ class CouponControllerTest {
     @MockBean
     private FcfsIssueService fcfsIssueService;
 
-    @DisplayName("쿠폰 발행에 성공하면 쿠폰 내용과 함께 Accepted 상태를 반환한다.")
+    @DisplayName("쿠폰 발행에 성공하면 Accepted 상태를 반환한다.")
     @Test
     void issue() throws Exception {
         // given
         final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
 
         // when
-        final ResultActions resultActions = mockMvc.perform(post("/issue")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andDo(print());
+        final ResultActions resultActions = performPost("/issue", request);
 
         // then
         resultActions
@@ -61,10 +58,7 @@ class CouponControllerTest {
         final IssuanceRequest request = new IssuanceRequest(invalidEmail);
 
         // when
-        final ResultActions resultActions = mockMvc.perform(post("/issue")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andDo(print());
+        final ResultActions resultActions = performPost("/issue", request);
 
         // then
         resultActions
@@ -83,10 +77,7 @@ class CouponControllerTest {
                 .when(fcfsIssueService).issue(any(IssuanceRequest.class));
 
         // when
-        final ResultActions resultActions = mockMvc.perform(post("/issue")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andDo(print());
+        final ResultActions resultActions = performPost("/issue", request);
 
         // then
         resultActions
@@ -104,10 +95,7 @@ class CouponControllerTest {
                 .when(fcfsIssueService).issue(any(IssuanceRequest.class));
 
         // when
-        final ResultActions resultActions = mockMvc.perform(post("/issue")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andDo(print());
+        final ResultActions resultActions = performPost("/issue", request);
 
         // then
         resultActions
@@ -125,14 +113,18 @@ class CouponControllerTest {
                 .when(fcfsIssueService).issue(any(IssuanceRequest.class));
 
         // when
-        final ResultActions resultActions = mockMvc.perform(post("/issue")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andDo(print());
+        final ResultActions resultActions = performPost("/issue", request);
 
         // then
         resultActions
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("title").value("쿠폰이 모두 소진되었습니다."));
+    }
+
+    private ResultActions performPost(final String url, final Object request) throws Exception {
+        return mockMvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print());
     }
 }
