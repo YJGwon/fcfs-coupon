@@ -3,6 +3,7 @@ package com.coupop.fcfscoupon;
 import com.coupop.fcfscoupon.coupon.CouponService;
 import com.coupop.fcfscoupon.coupon.dto.HistoryRequest;
 import com.coupop.fcfscoupon.coupon.dto.HistoryResponse;
+import com.coupop.fcfscoupon.coupon.dto.ResendRequest;
 import com.coupop.fcfscoupon.exception.ApiException;
 import com.coupop.fcfscoupon.fcfsissue.FcfsIssueService;
 import com.coupop.fcfscoupon.fcfsissue.dto.IssuanceRequest;
@@ -40,6 +41,12 @@ public class CouponController {
     @ResponseStatus(HttpStatus.OK)
     public HistoryResponse findHistoryByEmail(@RequestBody @Validated final HistoryRequest request) {
         return couponService.findHistoryByEmail(request);
+    }
+
+    @PostMapping("/resend")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void resend(@RequestBody final ResendRequest request) {
+        couponService.resend(request);
     }
 
     @ExceptionHandler(ApiException.class)

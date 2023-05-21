@@ -14,6 +14,7 @@ import com.coupop.fcfscoupon.coupon.CouponService;
 import com.coupop.fcfscoupon.coupon.dto.HistoryRequest;
 import com.coupop.fcfscoupon.coupon.dto.HistoryResponse;
 import com.coupop.fcfscoupon.coupon.dto.IssuedCouponResponse;
+import com.coupop.fcfscoupon.coupon.dto.ResendRequest;
 import com.coupop.fcfscoupon.coupon.exception.HistoryNotFoundException;
 import com.coupop.fcfscoupon.fcfsissue.FcfsIssueService;
 import com.coupop.fcfscoupon.fcfsissue.dto.IssuanceRequest;
@@ -162,11 +163,44 @@ class CouponControllerTest {
         final String email = "foo@bar.com";
         final HistoryRequest request = new HistoryRequest(email);
 
-        doThrow(new HistoryNotFoundException(email))
+        doThrow(HistoryNotFoundException.ofEmail(email))
                 .when(couponService).findHistoryByEmail(any(HistoryRequest.class));
 
         // when
         final ResultActions resultActions = performGet("/history", request);
+
+        // then
+        resultActions
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("title").value("쿠폰 발급 이력이 존재하지 않습니다."));
+    }
+
+    @DisplayName("발급된 쿠폰에 대해 재발송을 요청하면 같은 이메일로 재발송한 뒤 Accepted를 응답한다.")
+    @Test
+    void resend() throws Exception {
+        // given
+        final ResendRequest request = new ResendRequest("fakeId");
+
+        // when
+        final ResultActions resultActions = performPost("/resend", request);
+
+        // then
+        resultActions
+                .andExpect(status().isAccepted());
+    }
+
+    @DisplayName("발급된 쿠폰에 대해 재발송을 요청할 때 해당하는 발급 이력이 없으면 Not Found를 응답한다.")
+    @Test
+    void resend_ifHistoryNotFound() throws Exception {
+        // given
+        final String invalidId = "fakeId";
+        final ResendRequest request = new ResendRequest(invalidId);
+
+        doThrow(HistoryNotFoundException.ofId(invalidId))
+                .when(couponService).resend(any(ResendRequest.class));
+
+        // when
+        final ResultActions resultActions = performPost("/resend", request);
 
         // then
         resultActions
