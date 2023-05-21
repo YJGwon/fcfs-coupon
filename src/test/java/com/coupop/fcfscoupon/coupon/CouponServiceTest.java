@@ -1,6 +1,7 @@
 package com.coupop.fcfscoupon.coupon;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -8,9 +9,13 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
+import com.coupop.fcfscoupon.coupon.dto.HistoryRequest;
+import com.coupop.fcfscoupon.coupon.dto.HistoryResponse;
+import com.coupop.fcfscoupon.coupon.exception.HistoryNotFoundException;
 import com.coupop.fcfscoupon.coupon.model.Coupon;
 import com.coupop.fcfscoupon.coupon.model.CouponIssueHistory;
 import com.coupop.fcfscoupon.testconfig.IntegrationTestConfig;
+import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +35,7 @@ class CouponServiceTest extends IntegrationTestConfig {
     @Test
     void createAndSend() {
         // given
-        final String email = "yj970125@gmail.com";
+        final String email = "foo@bar.com";
 
         // when
         couponService.createAndSend(1L, email);
@@ -45,5 +50,31 @@ class CouponServiceTest extends IntegrationTestConfig {
                 () -> assertThat(savedHistory).isNotNull(),
                 () -> verify(couponEmailSender).send(any(Coupon.class), eq(email))
         );
+    }
+
+    @DisplayName("이메일로 쿠폰 발급 이력을 조회하여 응답한다.")
+    @Test
+    void findHistoryByEmail() {
+        // given
+        final String email = "foo@bar.com";
+        couponService.createAndSend(1L, email);
+        final HistoryRequest request = new HistoryRequest(email);
+
+        // when
+        final HistoryResponse response = couponService.findHistoryByEmail(request);
+
+        // then
+        assertThat(response.issuedCoupons()).hasSize(1);
+        assertThat(response.issuedCoupons().get(0).date()).isEqualTo(LocalDate.now().toString());
+    }
+
+    @DisplayName("이메일로 쿠폰 발급 이력을 조회할때 이력이 존재하지 않으면 예외가 발생한다.")
+    @Test
+    void findHistoryByEmail_ifHistoryNotFound() {
+        // given
+        final HistoryRequest request = new HistoryRequest("foo@bar.com");
+
+        assertThatExceptionOfType(HistoryNotFoundException.class)
+                .isThrownBy(() -> couponService.findHistoryByEmail(request));
     }
 }
