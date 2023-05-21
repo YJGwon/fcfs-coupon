@@ -4,5 +4,5 @@ public interface CouponIssueHistoryRepository {
 
     long save(final String email, final CouponIssueHistoryDetail detail);
 
-    CouponIssueHistory findByEmail(String email);
+    CouponIssueHistory findByEmail(final String email);
 }

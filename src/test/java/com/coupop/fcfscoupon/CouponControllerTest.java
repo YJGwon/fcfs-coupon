@@ -14,6 +14,7 @@ import com.coupop.fcfscoupon.coupon.CouponService;
 import com.coupop.fcfscoupon.coupon.dto.HistoryRequest;
 import com.coupop.fcfscoupon.coupon.dto.HistoryResponse;
 import com.coupop.fcfscoupon.coupon.dto.IssuedCouponResponse;
+import com.coupop.fcfscoupon.coupon.exception.HistoryNotFoundException;
 import com.coupop.fcfscoupon.fcfsissue.FcfsIssueService;
 import com.coupop.fcfscoupon.fcfsissue.dto.IssuanceRequest;
 import com.coupop.fcfscoupon.fcfsissue.exception.CouponNotOpenedException;
@@ -152,6 +153,25 @@ class CouponControllerTest {
                 .andExpect(jsonPath("$.issuedCoupons", hasSize(1)))
                 .andExpect(jsonPath("$.issuedCoupons[*].id").value("fakeid"))
                 .andExpect(jsonPath("$.issuedCoupons[*].date").value("2023-05-21"));
+    }
+
+    @DisplayName("이메일에 대한 쿠폰 발급 이력 조회시, 발급 이력이 존재하지 않으면 Not Found 상태를 반환한다.")
+    @Test
+    void findHistoryByEmail_ifHistoryNotFound() throws Exception {
+        // given
+        final String email = "foo@bar.com";
+        final HistoryRequest request = new HistoryRequest(email);
+
+        doThrow(new HistoryNotFoundException(email))
+                .when(couponService).findHistoryByEmail(any(HistoryRequest.class));
+
+        // when
+        final ResultActions resultActions = performGet("/history", request);
+
+        // then
+        resultActions
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("title").value("쿠폰 발급 이력이 존재하지 않습니다."));
     }
 
     private ResultActions performGet(final String url, final Object request) throws Exception {

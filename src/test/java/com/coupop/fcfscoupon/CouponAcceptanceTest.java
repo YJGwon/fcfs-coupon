@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
 import com.coupop.fcfscoupon.coupon.dto.HistoryRequest;
@@ -113,7 +114,7 @@ public class CouponAcceptanceTest extends IntegrationTestConfig {
                 .body("title", equalTo("쿠폰이 모두 소진되었습니다."));
     }
 
-    @DisplayName("이메일에 대해 쿠폰을 발급받은 날짜를 조회한다.")
+    @DisplayName("이메일에 대해 쿠폰을 발급받은 이력을 조회한다.")
     @Test
     void findHistoryByEmail() {
         // given
@@ -129,6 +130,20 @@ public class CouponAcceptanceTest extends IntegrationTestConfig {
         response.statusCode(OK.value())
                 .body("issuedCoupons", hasSize(1))
                 .body("issuedCoupons.date", contains(LocalDate.now().toString()));
+    }
+
+    @DisplayName("이메일에 대해 발급받은 쿠폰이 없을 경우 이력을 조회할 수 없다.")
+    @Test
+    void findHistoryByEmail_ifHistoryNotFound() {
+        // given
+        final HistoryRequest request = new HistoryRequest("foo@bar.com");
+
+        // when
+        ValidatableResponse response = get("/history", request);
+
+        // then
+        response.statusCode(NOT_FOUND.value())
+                .body("title", equalTo("쿠폰 발급 이력이 존재하지 않습니다."));
     }
 
     private ValidatableResponse get(final String url, final Object request) {
