@@ -24,6 +24,10 @@ public class CouponIssueHistory {
         return new CouponIssueHistory(email, coupon, LocalDate.now());
     }
 
+    public String getId() {
+        return id;
+    }
+
     public String getEmail() {
         return email;
     }

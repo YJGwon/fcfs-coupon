@@ -5,6 +5,6 @@ import com.coupop.fcfscoupon.coupon.model.CouponIssueHistory;
 public record IssuedCouponResponse(String id, String date) {
 
     public static IssuedCouponResponse of(final CouponIssueHistory history) {
-        return new IssuedCouponResponse(history.getCoupon().getId(), history.getCreatedAt());
+        return new IssuedCouponResponse(history.getId(), history.getCreatedAt());
     }
 }

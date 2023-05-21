@@ -10,6 +10,8 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
 import com.coupop.fcfscoupon.coupon.dto.HistoryRequest;
+import com.coupop.fcfscoupon.coupon.dto.HistoryResponse;
+import com.coupop.fcfscoupon.coupon.dto.ResendRequest;
 import com.coupop.fcfscoupon.fcfsissue.dto.IssuanceRequest;
 import com.coupop.fcfscoupon.fcfsissue.model.FcfsIssuePolicy;
 import com.coupop.fcfscoupon.testconfig.IntegrationTestConfig;
@@ -124,7 +126,7 @@ public class CouponAcceptanceTest extends IntegrationTestConfig {
         final HistoryRequest request = new HistoryRequest(email);
 
         // when
-        ValidatableResponse response = get("/history", request);
+        final ValidatableResponse response = get("/history", request);
 
         // then
         response.statusCode(OK.value())
@@ -139,7 +141,44 @@ public class CouponAcceptanceTest extends IntegrationTestConfig {
         final HistoryRequest request = new HistoryRequest("foo@bar.com");
 
         // when
-        ValidatableResponse response = get("/history", request);
+        final ValidatableResponse response = get("/history", request);
+
+        // then
+        response.statusCode(NOT_FOUND.value())
+                .body("title", equalTo("쿠폰 발급 이력이 존재하지 않습니다."));
+    }
+
+    @DisplayName("발급된 쿠폰을 같은 이메일로 다시 전달받는다.")
+    @Test
+    void resend() {
+        // given
+        final String email = "foo@bar.com";
+        post("/issue", new IssuanceRequest(email));
+        final HistoryResponse history = get("/history", new HistoryRequest(email))
+                .extract()
+                .body()
+                .as(HistoryResponse.class);
+        final String historyId = history.issuedCoupons()
+                .get(0)
+                .id();
+
+        final ResendRequest request = new ResendRequest(historyId);
+
+        // when
+        final ValidatableResponse response = post("resend", request);
+
+        // then
+        response.statusCode(ACCEPTED.value());
+    }
+
+    @DisplayName("해당하는 발급 이력이 존재하지 않으면 쿠폰을 재전송받을 수 없다.")
+    @Test
+    void resend_ifHistoryNotFound() {
+        // given
+        final ResendRequest request = new ResendRequest("invalidId");
+
+        // when
+        final ValidatableResponse response = post("resend", request);
 
         // then
         response.statusCode(NOT_FOUND.value())

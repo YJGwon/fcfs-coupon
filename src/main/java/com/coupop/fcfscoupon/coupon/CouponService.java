@@ -2,6 +2,7 @@ package com.coupop.fcfscoupon.coupon;
 
 import com.coupop.fcfscoupon.coupon.dto.HistoryRequest;
 import com.coupop.fcfscoupon.coupon.dto.HistoryResponse;
+import com.coupop.fcfscoupon.coupon.dto.ResendRequest;
 import com.coupop.fcfscoupon.coupon.exception.HistoryNotFoundException;
 import com.coupop.fcfscoupon.coupon.model.Coupon;
 import com.coupop.fcfscoupon.coupon.model.CouponEmailSender;
@@ -10,6 +11,7 @@ import com.coupop.fcfscoupon.coupon.model.CouponIssueHistoryRepository;
 import com.coupop.fcfscoupon.coupon.model.CouponRepository;
 import com.coupop.fcfscoupon.coupon.model.RandomCodeGenerator;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -45,5 +47,15 @@ public class CouponService {
             throw HistoryNotFoundException.ofEmail(email);
         }
         return HistoryResponse.of(historyList);
+    }
+
+    public void resend(final ResendRequest request) {
+        final String historyId = request.historyId();
+        final Optional<CouponIssueHistory> found = couponIssueHistoryRepository.findById(historyId);
+        if (found.isEmpty()) {
+            throw HistoryNotFoundException.ofId(historyId);
+        }
+        final CouponIssueHistory history = found.get();
+        couponEmailSender.send(history.getCoupon(), history.getEmail());
     }
 }
