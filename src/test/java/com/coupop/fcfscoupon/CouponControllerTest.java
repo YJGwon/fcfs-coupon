@@ -1,17 +1,28 @@
 package com.coupop.fcfscoupon;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.coupop.fcfscoupon.dto.CouponRequest;
-import com.coupop.fcfscoupon.execption.CouponNotOpenedException;
-import com.coupop.fcfscoupon.execption.CouponOutOfStockException;
-import com.coupop.fcfscoupon.execption.EmailAlreadyUsedException;
+import com.coupop.fcfscoupon.coupon.CouponService;
+import com.coupop.fcfscoupon.coupon.dto.HistoryRequest;
+import com.coupop.fcfscoupon.coupon.dto.HistoryResponse;
+import com.coupop.fcfscoupon.coupon.dto.IssuedCouponResponse;
+import com.coupop.fcfscoupon.coupon.dto.ResendRequest;
+import com.coupop.fcfscoupon.coupon.exception.HistoryNotFoundException;
+import com.coupop.fcfscoupon.fcfsissue.FcfsIssueService;
+import com.coupop.fcfscoupon.fcfsissue.dto.IssuanceRequest;
+import com.coupop.fcfscoupon.fcfsissue.exception.CouponNotOpenedException;
+import com.coupop.fcfscoupon.fcfsissue.exception.CouponOutOfStockException;
+import com.coupop.fcfscoupon.fcfsissue.exception.EmailAlreadyUsedException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -33,19 +44,19 @@ class CouponControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
+    private FcfsIssueService fcfsIssueService;
+
+    @MockBean
     private CouponService couponService;
 
-    @DisplayName("쿠폰 발행에 성공하면 쿠폰 내용과 함께 Accepted 상태를 반환한다.")
+    @DisplayName("쿠폰 발행에 성공하면 Accepted 상태를 반환한다.")
     @Test
     void issue() throws Exception {
         // given
-        final CouponRequest request = new CouponRequest("foo@bar.com");
+        final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
 
         // when
-        final ResultActions resultActions = mockMvc.perform(post("/issue")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andDo(print());
+        final ResultActions resultActions = performPost("/issue", request);
 
         // then
         resultActions
@@ -57,13 +68,10 @@ class CouponControllerTest {
     @ValueSource(strings = {"foobar.com", "foo@", "foo@com"})
     void issue_responseError_ifEmailInvalid(final String invalidEmail) throws Exception {
         // given
-        final CouponRequest request = new CouponRequest(invalidEmail);
+        final IssuanceRequest request = new IssuanceRequest(invalidEmail);
 
         // when
-        final ResultActions resultActions = mockMvc.perform(post("/issue")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andDo(print());
+        final ResultActions resultActions = performPost("/issue", request);
 
         // then
         resultActions
@@ -76,16 +84,13 @@ class CouponControllerTest {
     void issue_responseError_ifEmailUsedToday() throws Exception {
         // given
         final String email = "foo@bar.com";
-        final CouponRequest request = new CouponRequest(email);
+        final IssuanceRequest request = new IssuanceRequest(email);
 
         doThrow(new EmailAlreadyUsedException(email))
-                .when(couponService).issue(any(CouponRequest.class));
+                .when(fcfsIssueService).issue(any(IssuanceRequest.class));
 
         // when
-        final ResultActions resultActions = mockMvc.perform(post("/issue")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andDo(print());
+        final ResultActions resultActions = performPost("/issue", request);
 
         // then
         resultActions
@@ -97,16 +102,13 @@ class CouponControllerTest {
     @Test
     void issue_responseError_ifCouponIsNotOpen() throws Exception {
         // given
-        final CouponRequest request = new CouponRequest("foo@bar.com");
+        final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
 
         doThrow(new CouponNotOpenedException())
-                .when(couponService).issue(any(CouponRequest.class));
+                .when(fcfsIssueService).issue(any(IssuanceRequest.class));
 
         // when
-        final ResultActions resultActions = mockMvc.perform(post("/issue")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andDo(print());
+        final ResultActions resultActions = performPost("/issue", request);
 
         // then
         resultActions
@@ -118,20 +120,106 @@ class CouponControllerTest {
     @Test
     void issue_responseError_ifCouponOutOfStock() throws Exception {
         // given
-        final CouponRequest request = new CouponRequest("foo@bar.com");
+        final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
 
         doThrow(new CouponOutOfStockException())
-                .when(couponService).issue(any(CouponRequest.class));
+                .when(fcfsIssueService).issue(any(IssuanceRequest.class));
 
         // when
-        final ResultActions resultActions = mockMvc.perform(post("/issue")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andDo(print());
+        final ResultActions resultActions = performPost("/issue", request);
 
         // then
         resultActions
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("title").value("쿠폰이 모두 소진되었습니다."));
+    }
+
+    @DisplayName("이메일에 대한 쿠폰 발급 이력 조회에 성공하면 발급된 쿠폰 목록과 함께 OK 상태를 반환한다.")
+    @Test
+    void findHistoryByEmail() throws Exception {
+        // given
+        final String email = "foo@bar.com";
+        final HistoryRequest request = new HistoryRequest(email);
+        final HistoryResponse response = new HistoryResponse(
+                List.of(new IssuedCouponResponse("fakeid", "2023-05-21")));
+
+        given(couponService.findHistoryByEmail(any(HistoryRequest.class)))
+                .willReturn(response);
+        // when
+        final ResultActions resultActions = performGet("/history", request);
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.issuedCoupons", hasSize(1)))
+                .andExpect(jsonPath("$.issuedCoupons[*].id").value("fakeid"))
+                .andExpect(jsonPath("$.issuedCoupons[*].date").value("2023-05-21"));
+    }
+
+    @DisplayName("이메일에 대한 쿠폰 발급 이력 조회시, 발급 이력이 존재하지 않으면 Not Found 상태를 반환한다.")
+    @Test
+    void findHistoryByEmail_ifHistoryNotFound() throws Exception {
+        // given
+        final String email = "foo@bar.com";
+        final HistoryRequest request = new HistoryRequest(email);
+
+        doThrow(HistoryNotFoundException.ofEmail(email))
+                .when(couponService).findHistoryByEmail(any(HistoryRequest.class));
+
+        // when
+        final ResultActions resultActions = performGet("/history", request);
+
+        // then
+        resultActions
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("title").value("쿠폰 발급 이력이 존재하지 않습니다."));
+    }
+
+    @DisplayName("발급된 쿠폰에 대해 재발송을 요청하면 같은 이메일로 재발송한 뒤 Accepted를 응답한다.")
+    @Test
+    void resend() throws Exception {
+        // given
+        final ResendRequest request = new ResendRequest("fakeId");
+
+        // when
+        final ResultActions resultActions = performPost("/resend", request);
+
+        // then
+        resultActions
+                .andExpect(status().isAccepted());
+    }
+
+    @DisplayName("발급된 쿠폰에 대해 재발송을 요청할 때 해당하는 발급 이력이 없으면 Not Found를 응답한다.")
+    @Test
+    void resend_ifHistoryNotFound() throws Exception {
+        // given
+        final String invalidId = "fakeId";
+        final ResendRequest request = new ResendRequest(invalidId);
+
+        doThrow(HistoryNotFoundException.ofId(invalidId))
+                .when(couponService).resend(any(ResendRequest.class));
+
+        // when
+        final ResultActions resultActions = performPost("/resend", request);
+
+        // then
+        resultActions
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("title").value("쿠폰 발급 이력이 존재하지 않습니다."));
+    }
+
+    private ResultActions performGet(final String url, final Object request) throws Exception {
+        return mockMvc.perform(get(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print());
+    }
+
+    private ResultActions performPost(final String url, final Object request) throws Exception {
+        return mockMvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print());
     }
 }

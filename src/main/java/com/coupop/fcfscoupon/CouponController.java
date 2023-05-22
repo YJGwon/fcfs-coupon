@@ -1,13 +1,19 @@
 package com.coupop.fcfscoupon;
 
-import com.coupop.fcfscoupon.dto.CouponRequest;
-import com.coupop.fcfscoupon.execption.ApiException;
+import com.coupop.fcfscoupon.coupon.CouponService;
+import com.coupop.fcfscoupon.coupon.dto.HistoryRequest;
+import com.coupop.fcfscoupon.coupon.dto.HistoryResponse;
+import com.coupop.fcfscoupon.coupon.dto.ResendRequest;
+import com.coupop.fcfscoupon.exception.ApiException;
+import com.coupop.fcfscoupon.fcfsissue.FcfsIssueService;
+import com.coupop.fcfscoupon.fcfsissue.dto.IssuanceRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -16,16 +22,31 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class CouponController {
 
+    private final FcfsIssueService fcfsIssueService;
     private final CouponService couponService;
 
-    public CouponController(final CouponService couponService) {
+    public CouponController(final FcfsIssueService fcfsIssueService,
+                            final CouponService couponService) {
+        this.fcfsIssueService = fcfsIssueService;
         this.couponService = couponService;
     }
 
     @PostMapping("/issue")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void issue(@RequestBody @Validated final CouponRequest request) {
-        couponService.issue(request);
+    public void issue(@RequestBody @Validated final IssuanceRequest request) {
+        fcfsIssueService.issue(request);
+    }
+
+    @GetMapping("/history")
+    @ResponseStatus(HttpStatus.OK)
+    public HistoryResponse findHistoryByEmail(@RequestBody @Validated final HistoryRequest request) {
+        return couponService.findHistoryByEmail(request);
+    }
+
+    @PostMapping("/resend")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void resend(@RequestBody final ResendRequest request) {
+        couponService.resend(request);
     }
 
     @ExceptionHandler(ApiException.class)
