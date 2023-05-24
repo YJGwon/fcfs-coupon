@@ -9,9 +9,9 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
-import com.coupop.fcfscoupon.coupon.dto.HistoryRequest;
-import com.coupop.fcfscoupon.coupon.dto.HistoryResponse;
-import com.coupop.fcfscoupon.coupon.dto.ResendRequest;
+import com.coupop.coupon.dto.HistoryRequest;
+import com.coupop.coupon.dto.HistoryResponse;
+import com.coupop.coupon.dto.ResendRequest;
 import com.coupop.fcfscoupon.fcfsissue.dto.IssuanceRequest;
 import com.coupop.fcfscoupon.fcfsissue.model.FcfsIssuePolicy;
 import com.coupop.fcfscoupon.testconfig.IntegrationTestConfig;

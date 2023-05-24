@@ -10,12 +10,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.coupop.fcfscoupon.coupon.CouponService;
-import com.coupop.fcfscoupon.coupon.dto.HistoryRequest;
-import com.coupop.fcfscoupon.coupon.dto.HistoryResponse;
-import com.coupop.fcfscoupon.coupon.dto.IssuedCouponResponse;
-import com.coupop.fcfscoupon.coupon.dto.ResendRequest;
-import com.coupop.fcfscoupon.coupon.exception.HistoryNotFoundException;
+import com.coupop.coupon.CouponService;
+import com.coupop.coupon.dto.HistoryRequest;
+import com.coupop.coupon.dto.HistoryResponse;
+import com.coupop.coupon.dto.IssuedCouponResponse;
+import com.coupop.coupon.dto.ResendRequest;
+import com.coupop.coupon.exception.HistoryNotFoundException;
 import com.coupop.fcfscoupon.fcfsissue.FcfsIssueService;
 import com.coupop.fcfscoupon.fcfsissue.dto.IssuanceRequest;
 import com.coupop.fcfscoupon.fcfsissue.exception.CouponNotOpenedException;

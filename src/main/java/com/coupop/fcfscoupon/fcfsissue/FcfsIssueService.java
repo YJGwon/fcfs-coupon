@@ -1,6 +1,6 @@
 package com.coupop.fcfscoupon.fcfsissue;
 
-import com.coupop.fcfscoupon.coupon.CouponService;
+import com.coupop.coupon.CouponService;
 import com.coupop.fcfscoupon.fcfsissue.dto.IssuanceRequest;
 import com.coupop.fcfscoupon.fcfsissue.exception.CouponNotOpenedException;
 import com.coupop.fcfscoupon.fcfsissue.exception.CouponOutOfStockException;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class FcfsIssueService {
-
 
     private final CouponService couponService;
 

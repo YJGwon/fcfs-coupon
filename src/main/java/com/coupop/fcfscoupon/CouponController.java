@@ -1,10 +1,10 @@
 package com.coupop.fcfscoupon;
 
-import com.coupop.fcfscoupon.coupon.CouponService;
-import com.coupop.fcfscoupon.coupon.dto.HistoryRequest;
-import com.coupop.fcfscoupon.coupon.dto.HistoryResponse;
-import com.coupop.fcfscoupon.coupon.dto.ResendRequest;
-import com.coupop.fcfscoupon.exception.ApiException;
+import com.coupop.coupon.CouponService;
+import com.coupop.coupon.dto.HistoryRequest;
+import com.coupop.coupon.dto.HistoryResponse;
+import com.coupop.coupon.dto.ResendRequest;
+import com.coupop.core.exception.ApiException;
 import com.coupop.fcfscoupon.fcfsissue.FcfsIssueService;
 import com.coupop.fcfscoupon.fcfsissue.dto.IssuanceRequest;
 import org.springframework.http.HttpStatus;

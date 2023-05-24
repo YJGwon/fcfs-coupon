@@ -1,10 +1,9 @@
 package com.coupop.fcfscoupon.fcfsissue.exception;
 
-import com.coupop.fcfscoupon.exception.ApiException;
+import com.coupop.core.exception.BadRequestException;
 import com.coupop.fcfscoupon.fcfsissue.model.FcfsIssuePolicy;
-import org.springframework.http.HttpStatus;
 
-public class CouponOutOfStockException extends ApiException {
+public class CouponOutOfStockException extends BadRequestException {
 
     private static final String TITLE = "쿠폰이 모두 소진되었습니다.";
     private static final String DETAIL = String.format(
@@ -13,6 +12,6 @@ public class CouponOutOfStockException extends ApiException {
             FcfsIssuePolicy.getOpenAt().getHour(), FcfsIssuePolicy.getOpenAt().getMinute());
 
     public CouponOutOfStockException() {
-        super(TITLE, DETAIL, HttpStatus.BAD_REQUEST);
+        super(TITLE, DETAIL);
     }
 }
