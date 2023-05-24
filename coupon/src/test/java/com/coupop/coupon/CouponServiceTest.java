@@ -17,7 +17,7 @@ import com.coupop.coupon.dto.ResendRequest;
 import com.coupop.coupon.exception.HistoryNotFoundException;
 import com.coupop.coupon.model.Coupon;
 import com.coupop.coupon.model.CouponIssueHistory;
-import com.coupop.coupon.testconfig.IntegrationTestConfig;
+import com.coupop.coupon.testconfig.CouponIntegrationTestConfig;
 import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 
-class CouponServiceTest extends IntegrationTestConfig {
+class CouponServiceTest extends CouponIntegrationTestConfig {
 
     @Autowired
     private CouponService couponService;

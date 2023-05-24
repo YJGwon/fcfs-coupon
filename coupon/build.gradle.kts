@@ -4,7 +4,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
     // spring data mongodb
-    implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+    "api"("org.springframework.boot:spring-boot-starter-data-mongodb")
 
     // spring validation
     implementation("org.springframework.boot:spring-boot-starter-validation")
