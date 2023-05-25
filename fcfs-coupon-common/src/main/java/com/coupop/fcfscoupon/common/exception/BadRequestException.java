@@ -1,4 +1,4 @@
-package com.coupop.core.exception;
+package com.coupop.fcfscoupon.common.exception;
 
 import org.springframework.http.HttpStatus;
 

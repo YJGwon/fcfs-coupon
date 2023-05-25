@@ -1,12 +1,12 @@
 package com.coupop.api;
 
 import com.coupop.api.dto.HistoryRequest;
+import com.coupop.api.dto.HistoryResponse;
 import com.coupop.api.dto.IssuanceRequest;
 import com.coupop.api.dto.ResendRequest;
 import com.coupop.api.support.RequestTime;
-import com.coupop.core.exception.ApiException;
 import com.coupop.coupon.CouponService;
-import com.coupop.api.dto.HistoryResponse;
+import com.coupop.fcfscoupon.common.exception.ApiException;
 import com.coupop.fcfsissue.FcfsIssueService;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;

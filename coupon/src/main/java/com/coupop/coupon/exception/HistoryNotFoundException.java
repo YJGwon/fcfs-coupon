@@ -1,6 +1,6 @@
 package com.coupop.coupon.exception;
 
-import com.coupop.core.exception.NotFoundException;
+import com.coupop.fcfscoupon.common.exception.NotFoundException;
 
 public class HistoryNotFoundException extends NotFoundException {
 

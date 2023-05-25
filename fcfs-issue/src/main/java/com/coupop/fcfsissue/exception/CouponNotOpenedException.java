@@ -1,7 +1,7 @@
 package com.coupop.fcfsissue.exception;
 
 
-import com.coupop.core.exception.BadRequestException;
+import com.coupop.fcfscoupon.common.exception.BadRequestException;
 import com.coupop.fcfsissue.model.FcfsIssuePolicy;
 
 public class CouponNotOpenedException extends BadRequestException {

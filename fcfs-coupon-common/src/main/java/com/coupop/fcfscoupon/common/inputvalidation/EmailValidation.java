@@ -1,4 +1,4 @@
-package com.coupop.core.inputvalidation;
+package com.coupop.fcfscoupon.common.inputvalidation;
 
 public class EmailValidation {
 

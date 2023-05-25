@@ -1,5 +1,5 @@
 dependencies {
-    implementation(project(":core"))
+    implementation(project(":fcfs-coupon-common"))
     implementation(project(":coupon"))
     implementation(project(":fcfs-issue"))
 

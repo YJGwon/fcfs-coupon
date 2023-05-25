@@ -1,6 +1,6 @@
 package com.coupop.fcfsissue.exception;
 
-import com.coupop.core.exception.BadRequestException;
+import com.coupop.fcfscoupon.common.exception.BadRequestException;
 
 public class EmailAlreadyUsedException extends BadRequestException {
 
