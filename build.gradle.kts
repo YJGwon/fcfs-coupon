@@ -1,43 +1,29 @@
 plugins {
-    java
-    id("org.springframework.boot") version "3.0.6"
-    id("io.spring.dependency-management") version "1.1.0"
+    `java-library`
+    id("org.springframework.boot") version "3.0.6" apply false
+    id("io.spring.dependency-management") version "1.1.0" apply false
 }
 
-group = "com.coupop"
-version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_17
-
-repositories {
-    mavenCentral()
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
-dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+allprojects {
+    group = "com.coupop"
+    version = "0.0.1-SNAPSHOT"
 
-    // spring data redis
-    implementation("org.springframework.boot:spring-boot-starter-data-redis")
-
-    // spring data mongodb
-    implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
-
-    // spring validation
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-
-    // spring mail
-    implementation("org.springframework.boot:spring-boot-starter-mail")
-
-    // embedded redis
-    implementation("it.ozimov:embedded-redis:0.7.2")
-
-    // embedded mongodb
-    implementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo.spring30x:4.6.2")
-
-    // rest-assured
-    testImplementation("io.rest-assured:rest-assured:5.3.0")
+    repositories {
+        mavenCentral()
+    }
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
+subprojects {
+    apply(plugin = "java-library")
+    apply(plugin = "org.springframework.boot")
+    apply(plugin = "io.spring.dependency-management")
+
+    tasks.withType<Test> {
+        useJUnitPlatform()
+    }
 }
