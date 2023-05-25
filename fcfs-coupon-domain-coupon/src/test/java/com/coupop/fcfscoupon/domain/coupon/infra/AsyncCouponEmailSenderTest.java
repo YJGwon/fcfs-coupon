@@ -1,4 +1,4 @@
-package com.coupop.fcfscoupon.domain.coupon;
+package com.coupop.fcfscoupon.domain.coupon.infra;
 
 import com.coupop.fcfscoupon.domain.coupon.model.Coupon;
 import com.coupop.fcfscoupon.domain.coupon.model.CouponEmailSender;
