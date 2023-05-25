@@ -1,4 +1,4 @@
-package com.coupop.fcfsissue.support;
+package com.coupop.api.support;
 
 import java.time.LocalTime;
 import org.springframework.context.annotation.Scope;

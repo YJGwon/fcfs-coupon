@@ -1,14 +1,13 @@
 package com.coupop.fcfsissue;
 
 import com.coupop.coupon.CouponService;
-import com.coupop.fcfsissue.dto.IssuanceRequest;
 import com.coupop.fcfsissue.exception.CouponNotOpenedException;
 import com.coupop.fcfsissue.exception.CouponOutOfStockException;
 import com.coupop.fcfsissue.exception.EmailAlreadyUsedException;
 import com.coupop.fcfsissue.model.FcfsIssuePolicy;
 import com.coupop.fcfsissue.persistence.RedisFcfsIssueRepository;
-import com.coupop.fcfsissue.support.RequestTime;
 import com.coupop.fcfsissue.support.TransactionalRedisOperations;
+import java.time.LocalTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -20,21 +19,16 @@ public class FcfsIssueService {
     private final RedisFcfsIssueRepository redisFcfsIssueRepository;
     private final TransactionalRedisOperations transactionalRedisOperations;
 
-    private final RequestTime requestTime;
-
     public FcfsIssueService(final CouponService couponService,
                             final RedisFcfsIssueRepository redisFcfsIssueRepository,
-                            final TransactionalRedisOperations transactionalRedisOperations,
-                            final RequestTime requestTime) {
+                            final TransactionalRedisOperations transactionalRedisOperations) {
         this.couponService = couponService;
         this.redisFcfsIssueRepository = redisFcfsIssueRepository;
         this.transactionalRedisOperations = transactionalRedisOperations;
-        this.requestTime = requestTime;
     }
 
-    public void issue(final IssuanceRequest request) {
-        checkCouponOpen();
-        final String email = request.email();
+    public void issue(final String email, final LocalTime requestTime) {
+        checkCouponOpen(requestTime);
         final Long sequence = checkIssuableAndGetSequence(email);
 
         couponService.createAndSend(sequence, email);
@@ -55,8 +49,8 @@ public class FcfsIssueService {
         return count;
     }
 
-    private void checkCouponOpen() {
-        if (FcfsIssuePolicy.isCouponClosed(requestTime.getValue())) {
+    private void checkCouponOpen(final LocalTime requestTime) {
+        if (FcfsIssuePolicy.isCouponClosed(requestTime)) {
             throw new CouponNotOpenedException();
         }
     }

@@ -1,12 +1,13 @@
 package com.coupop.api;
 
+import com.coupop.api.dto.IssuanceRequest;
+import com.coupop.api.support.RequestTime;
 import com.coupop.core.exception.ApiException;
 import com.coupop.coupon.CouponService;
 import com.coupop.coupon.dto.HistoryRequest;
 import com.coupop.coupon.dto.HistoryResponse;
 import com.coupop.coupon.dto.ResendRequest;
 import com.coupop.fcfsissue.FcfsIssueService;
-import com.coupop.fcfsissue.dto.IssuanceRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
@@ -24,17 +25,20 @@ public class CouponController {
 
     private final FcfsIssueService fcfsIssueService;
     private final CouponService couponService;
+    private final RequestTime requestTime;
 
     public CouponController(final FcfsIssueService fcfsIssueService,
-                            final CouponService couponService) {
+                            final CouponService couponService,
+                            final RequestTime requestTime) {
         this.fcfsIssueService = fcfsIssueService;
         this.couponService = couponService;
+        this.requestTime = requestTime;
     }
 
     @PostMapping("/issue")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void issue(@RequestBody @Validated final IssuanceRequest request) {
-        fcfsIssueService.issue(request);
+        fcfsIssueService.issue(request.email(), requestTime.getValue());
     }
 
     @GetMapping("/history")

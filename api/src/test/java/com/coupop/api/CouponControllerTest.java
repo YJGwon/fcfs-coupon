@@ -2,6 +2,7 @@ package com.coupop.api;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -10,6 +11,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.coupop.api.dto.IssuanceRequest;
+import com.coupop.api.support.RequestTime;
 import com.coupop.coupon.CouponService;
 import com.coupop.coupon.dto.HistoryRequest;
 import com.coupop.coupon.dto.HistoryResponse;
@@ -17,11 +20,11 @@ import com.coupop.coupon.dto.IssuedCouponResponse;
 import com.coupop.coupon.dto.ResendRequest;
 import com.coupop.coupon.exception.HistoryNotFoundException;
 import com.coupop.fcfsissue.FcfsIssueService;
-import com.coupop.fcfsissue.dto.IssuanceRequest;
 import com.coupop.fcfsissue.exception.CouponNotOpenedException;
 import com.coupop.fcfsissue.exception.CouponOutOfStockException;
 import com.coupop.fcfsissue.exception.EmailAlreadyUsedException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,11 +33,13 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 @WebMvcTest
+@Import(RequestTime.class)
 class CouponControllerTest {
 
     @Autowired
@@ -87,7 +92,7 @@ class CouponControllerTest {
         final IssuanceRequest request = new IssuanceRequest(email);
 
         doThrow(new EmailAlreadyUsedException(email))
-                .when(fcfsIssueService).issue(any(IssuanceRequest.class));
+                .when(fcfsIssueService).issue(eq(email), any(LocalTime.class));
 
         // when
         final ResultActions resultActions = performPost("/issue", request);
@@ -102,10 +107,11 @@ class CouponControllerTest {
     @Test
     void issue_responseError_ifCouponIsNotOpen() throws Exception {
         // given
-        final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
+        final String email = "foo@bar.com";
+        final IssuanceRequest request = new IssuanceRequest(email);
 
         doThrow(new CouponNotOpenedException())
-                .when(fcfsIssueService).issue(any(IssuanceRequest.class));
+                .when(fcfsIssueService).issue(eq(email), any(LocalTime.class));
 
         // when
         final ResultActions resultActions = performPost("/issue", request);
@@ -120,10 +126,11 @@ class CouponControllerTest {
     @Test
     void issue_responseError_ifCouponOutOfStock() throws Exception {
         // given
-        final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
+        final String email = "foo@bar.com";
+        final IssuanceRequest request = new IssuanceRequest(email);
 
         doThrow(new CouponOutOfStockException())
-                .when(fcfsIssueService).issue(any(IssuanceRequest.class));
+                .when(fcfsIssueService).issue(eq(email), any(LocalTime.class));
 
         // when
         final ResultActions resultActions = performPost("/issue", request);

@@ -2,9 +2,7 @@ package com.coupop.fcfsissue;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.mockito.BDDMockito.given;
 
-import com.coupop.fcfsissue.dto.IssuanceRequest;
 import com.coupop.fcfsissue.exception.CouponNotOpenedException;
 import com.coupop.fcfsissue.exception.CouponOutOfStockException;
 import com.coupop.fcfsissue.exception.EmailAlreadyUsedException;
@@ -19,58 +17,49 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class FcfsIssueServiceTest extends IntegrationTestConfig {
 
+    private static final LocalTime OPENED_TIME = FcfsIssuePolicy.getOpenAt();
+
     @Autowired
     private FcfsIssueService fcfsIssueService;
 
     @DisplayName("쿠폰을 발급한다.")
     @Test
     void issue() {
-        // given
-        final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
-
-        // when & then
         assertThatNoException()
-                .isThrownBy(() -> fcfsIssueService.issue(request));
+                .isThrownBy(() -> fcfsIssueService.issue("foo@bar.com", OPENED_TIME));
     }
 
     @DisplayName("쿠폰을 발급할 때 쿠폰이 열려있지 않으면 예외가 발생한다.")
     @Test
     void issue_throwsException_ifCouponIsNotOpen() {
         // given
-        final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
-
-        final LocalTime closedTime = LocalTime.of(9, 59);
-        given(requestTime.getValue())
-                .willReturn(closedTime);
+        final LocalTime closedTime = OPENED_TIME.minusMinutes(1L);
 
         // when & then
         assertThatExceptionOfType(CouponNotOpenedException.class)
-                .isThrownBy(() -> fcfsIssueService.issue(request));
+                .isThrownBy(() -> fcfsIssueService.issue("foo@bar.com", closedTime));
     }
 
     @DisplayName("쿠폰을 발급할 때 당일에 이미 사용된 이메일이면 예외가 발생한다.")
     @Test
     void issue_throwsException_ifEmailUsedToday() {
         // given
-        final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
-
-        fcfsIssueService.issue(request);
+        final String email = "foo@bar.com";
+        fcfsIssueService.issue(email, OPENED_TIME);
 
         // when & then
         assertThatExceptionOfType(EmailAlreadyUsedException.class)
-                .isThrownBy(() -> fcfsIssueService.issue(request));
+                .isThrownBy(() -> fcfsIssueService.issue(email, OPENED_TIME));
     }
 
     @DisplayName("쿠폰을 발급할 때 쿠폰이 소진되면 예외가 발생한다.")
     @Test
     void issue_throwsException_ifCouponOutOfStock() {
         // given
-        final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
-
         databaseSetUp.setCount(FcfsIssuePolicy.getLimit());
 
         // when & then
         assertThatExceptionOfType(CouponOutOfStockException.class)
-                .isThrownBy(() -> fcfsIssueService.issue(request));
+                .isThrownBy(() -> fcfsIssueService.issue("foo@bar.com", OPENED_TIME));
     }
 }

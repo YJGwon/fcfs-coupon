@@ -1,4 +1,4 @@
-package com.coupop.fcfsissue.dto;
+package com.coupop.api.dto;
 
 import com.coupop.core.inputvalidation.EmailValidation;
 import jakarta.validation.constraints.Email;
