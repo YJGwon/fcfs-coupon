@@ -1,4 +1,4 @@
-package com.coupop.fcfsissue;
+package com.coupop.api;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
@@ -16,6 +16,7 @@ import com.coupop.coupon.dto.HistoryResponse;
 import com.coupop.coupon.dto.IssuedCouponResponse;
 import com.coupop.coupon.dto.ResendRequest;
 import com.coupop.coupon.exception.HistoryNotFoundException;
+import com.coupop.fcfsissue.FcfsIssueService;
 import com.coupop.fcfsissue.dto.IssuanceRequest;
 import com.coupop.fcfsissue.exception.CouponNotOpenedException;
 import com.coupop.fcfsissue.exception.CouponOutOfStockException;

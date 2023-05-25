@@ -14,7 +14,7 @@ import com.coupop.coupon.dto.HistoryResponse;
 import com.coupop.coupon.dto.ResendRequest;
 import com.coupop.fcfsissue.dto.IssuanceRequest;
 import com.coupop.fcfsissue.model.FcfsIssuePolicy;
-import com.coupop.fcfsissue.testconfig.IntegrationTestConfig;
+import com.coupop.testconfig.IntegrationTestConfig;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
