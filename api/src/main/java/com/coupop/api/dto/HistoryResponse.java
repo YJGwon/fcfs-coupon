@@ -1,6 +1,6 @@
 package com.coupop.api.dto;
 
-import com.coupop.coupon.model.CouponIssueHistory;
+import com.coupop.fcfscoupon.domain.coupon.model.CouponIssueHistory;
 import java.util.List;
 
 public record HistoryResponse(List<IssuedCouponResponse> issuedCoupons) {

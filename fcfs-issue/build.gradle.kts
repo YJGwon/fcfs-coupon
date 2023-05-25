@@ -1,6 +1,6 @@
 dependencies {
     implementation(project(":fcfs-coupon-common"))
-    implementation(project(":coupon"))
+    implementation(project(":fcfs-coupon-domain-coupon"))
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 

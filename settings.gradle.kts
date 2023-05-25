@@ -1,3 +1,4 @@
 rootProject.name = "fcfs-coupon"
-include("coupon", "fcfs-issue", "api")
+include("fcfs-issue", "api")
+include("fcfs-coupon-domain-coupon")
 include("fcfs-coupon-common")

@@ -5,8 +5,8 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
 import com.coupop.api.support.RequestTime;
-import com.coupop.coupon.model.CouponEmailSender;
-import com.coupop.coupon.model.RandomCodeGenerator;
+import com.coupop.fcfscoupon.domain.coupon.model.CouponEmailSender;
+import com.coupop.fcfscoupon.domain.coupon.model.RandomCodeGenerator;
 import com.coupop.fcfsissue.model.FcfsIssuePolicy;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,6 @@
 package com.coupop.fcfsissue;
 
-import com.coupop.coupon.CouponService;
+import com.coupop.fcfscoupon.domain.coupon.CouponService;
 import com.coupop.fcfsissue.exception.CouponNotOpenedException;
 import com.coupop.fcfsissue.exception.CouponOutOfStockException;
 import com.coupop.fcfsissue.exception.EmailAlreadyUsedException;

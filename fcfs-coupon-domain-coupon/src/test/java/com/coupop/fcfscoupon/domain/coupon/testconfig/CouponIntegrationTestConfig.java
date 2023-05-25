@@ -1,4 +1,4 @@
-package com.coupop.fcfsissue.testconfig;
+package com.coupop.fcfscoupon.domain.coupon.testconfig;
 
 
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -12,12 +12,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 @SpringBootTest
-public abstract class IntegrationTestConfig {
+public abstract class CouponIntegrationTestConfig {
 
     protected static final String MOCKED_COUPON_VALUE = "fakevalue";
 
     @Autowired
-    protected DatabaseSetUp databaseSetUp;
+    protected MongoDatabaseCleaner databaseCleaner;
 
     @MockBean
     protected RandomCodeGenerator codeGenerator;
@@ -27,7 +27,7 @@ public abstract class IntegrationTestConfig {
 
     @BeforeEach
     void integrationSetup() {
-        databaseSetUp.cleanRedis();
+        databaseCleaner.clean();
 
         given(codeGenerator.generate(anyLong()))
                 .willReturn(MOCKED_COUPON_VALUE);

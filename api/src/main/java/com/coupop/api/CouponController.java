@@ -5,7 +5,7 @@ import com.coupop.api.dto.HistoryResponse;
 import com.coupop.api.dto.IssuanceRequest;
 import com.coupop.api.dto.ResendRequest;
 import com.coupop.api.support.RequestTime;
-import com.coupop.coupon.CouponService;
+import com.coupop.fcfscoupon.domain.coupon.CouponService;
 import com.coupop.fcfscoupon.common.exception.ApiException;
 import com.coupop.fcfsissue.FcfsIssueService;
 import org.springframework.http.HttpStatus;
