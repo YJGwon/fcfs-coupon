@@ -12,12 +12,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.coupop.api.dto.HistoryRequest;
+import com.coupop.api.dto.HistoryResponse;
 import com.coupop.api.dto.IssuanceRequest;
+import com.coupop.api.dto.IssuedCouponResponse;
 import com.coupop.api.dto.ResendRequest;
 import com.coupop.api.support.RequestTime;
+import com.coupop.coupon.CouponIssueHistoriesResponseConverter;
 import com.coupop.coupon.CouponService;
-import com.coupop.coupon.dto.HistoryResponse;
-import com.coupop.coupon.dto.IssuedCouponResponse;
 import com.coupop.coupon.exception.HistoryNotFoundException;
 import com.coupop.fcfsissue.FcfsIssueService;
 import com.coupop.fcfsissue.exception.CouponNotOpenedException;
@@ -150,7 +151,7 @@ class CouponControllerTest {
         final HistoryResponse response = new HistoryResponse(
                 List.of(new IssuedCouponResponse("fakeid", "2023-05-21")));
 
-        given(couponService.findHistoryByEmail(email))
+        given(couponService.findHistoryByEmail(eq(email), any(CouponIssueHistoriesResponseConverter.class)))
                 .willReturn(response);
         // when
         final ResultActions resultActions = performGet("/history", request);
@@ -171,7 +172,7 @@ class CouponControllerTest {
         final HistoryRequest request = new HistoryRequest(email);
 
         doThrow(HistoryNotFoundException.ofEmail(email))
-                .when(couponService).findHistoryByEmail(email);
+                .when(couponService).findHistoryByEmail(eq(email), any(CouponIssueHistoriesResponseConverter.class));
 
         // when
         final ResultActions resultActions = performGet("/history", request);

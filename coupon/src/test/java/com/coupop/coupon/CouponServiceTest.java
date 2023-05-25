@@ -11,12 +11,12 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
-import com.coupop.coupon.dto.HistoryResponse;
 import com.coupop.coupon.exception.HistoryNotFoundException;
 import com.coupop.coupon.model.Coupon;
 import com.coupop.coupon.model.CouponIssueHistory;
 import com.coupop.coupon.testconfig.CouponIntegrationTestConfig;
 import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,18 +60,18 @@ class CouponServiceTest extends CouponIntegrationTestConfig {
         couponService.createAndSend(1L, email);
 
         // when
-        final HistoryResponse response = couponService.findHistoryByEmail(email);
+        final List<CouponIssueHistory> histories = couponService.findHistoryByEmail(email, found -> found);
 
         // then
-        assertThat(response.issuedCoupons()).hasSize(1);
-        assertThat(response.issuedCoupons().get(0).date()).isEqualTo(LocalDate.now().toString());
+        assertThat(histories).hasSize(1);
+        assertThat(histories.get(0).getCreatedAt()).isEqualTo(LocalDate.now().toString());
     }
 
     @DisplayName("이메일로 쿠폰 발급 이력을 조회할때 이력이 존재하지 않으면 예외가 발생한다.")
     @Test
     void findHistoryByEmail_ifHistoryNotFound() {
         assertThatExceptionOfType(HistoryNotFoundException.class)
-                .isThrownBy(() -> couponService.findHistoryByEmail("foo@bar.com"));
+                .isThrownBy(() -> couponService.findHistoryByEmail("foo@bar.com", found -> found));
     }
 
     @DisplayName("이미 발급된 쿠폰에 대해 재전송을 요청하면 같은 이메일로 재전송한다.")

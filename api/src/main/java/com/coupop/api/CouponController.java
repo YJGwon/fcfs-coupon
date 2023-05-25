@@ -6,7 +6,7 @@ import com.coupop.api.dto.ResendRequest;
 import com.coupop.api.support.RequestTime;
 import com.coupop.core.exception.ApiException;
 import com.coupop.coupon.CouponService;
-import com.coupop.coupon.dto.HistoryResponse;
+import com.coupop.api.dto.HistoryResponse;
 import com.coupop.fcfsissue.FcfsIssueService;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
@@ -44,7 +44,7 @@ public class CouponController {
     @GetMapping("/history")
     @ResponseStatus(HttpStatus.OK)
     public HistoryResponse findHistoryByEmail(@RequestBody @Validated final HistoryRequest request) {
-        return couponService.findHistoryByEmail(request.email());
+        return couponService.findHistoryByEmail(request.email(), HistoryResponse::of);
     }
 
     @PostMapping("/resend")

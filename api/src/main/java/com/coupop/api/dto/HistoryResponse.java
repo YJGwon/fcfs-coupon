@@ -1,4 +1,4 @@
-package com.coupop.coupon.dto;
+package com.coupop.api.dto;
 
 import com.coupop.coupon.model.CouponIssueHistory;
 import java.util.List;

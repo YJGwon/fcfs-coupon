@@ -12,7 +12,7 @@ import static org.springframework.http.HttpStatus.OK;
 import com.coupop.api.dto.HistoryRequest;
 import com.coupop.api.dto.IssuanceRequest;
 import com.coupop.api.dto.ResendRequest;
-import com.coupop.coupon.dto.HistoryResponse;
+import com.coupop.api.dto.HistoryResponse;
 import com.coupop.fcfsissue.model.FcfsIssuePolicy;
 import com.coupop.testconfig.IntegrationTestConfig;
 import io.restassured.RestAssured;
