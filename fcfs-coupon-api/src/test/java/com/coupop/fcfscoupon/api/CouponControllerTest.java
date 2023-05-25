@@ -17,7 +17,6 @@ import com.coupop.fcfscoupon.api.dto.IssuanceRequest;
 import com.coupop.fcfscoupon.api.dto.IssuedCouponResponse;
 import com.coupop.fcfscoupon.api.dto.ResendRequest;
 import com.coupop.fcfscoupon.api.support.RequestTime;
-import com.coupop.fcfscoupon.domain.coupon.CouponIssueHistoriesResponseConverter;
 import com.coupop.fcfscoupon.domain.coupon.CouponService;
 import com.coupop.fcfscoupon.domain.coupon.exception.HistoryNotFoundException;
 import com.coupop.fcfscoupon.domain.fcfs.FcfsIssueService;
@@ -27,6 +26,7 @@ import com.coupop.fcfscoupon.domain.fcfs.exception.EmailAlreadyUsedException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.function.Function;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -151,7 +151,7 @@ class CouponControllerTest {
         final HistoryResponse response = new HistoryResponse(
                 List.of(new IssuedCouponResponse("fakeid", "2023-05-21")));
 
-        given(couponService.findHistoryByEmail(eq(email), any(CouponIssueHistoriesResponseConverter.class)))
+        given(couponService.findHistoryByEmail(eq(email), any(Function.class)))
                 .willReturn(response);
         // when
         final ResultActions resultActions = performGet("/history", request);
@@ -172,7 +172,7 @@ class CouponControllerTest {
         final HistoryRequest request = new HistoryRequest(email);
 
         doThrow(HistoryNotFoundException.ofEmail(email))
-                .when(couponService).findHistoryByEmail(eq(email), any(CouponIssueHistoriesResponseConverter.class));
+                .when(couponService).findHistoryByEmail(eq(email), any(Function.class));
 
         // when
         final ResultActions resultActions = performGet("/history", request);

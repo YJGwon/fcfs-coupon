@@ -17,6 +17,7 @@ import com.coupop.fcfscoupon.domain.coupon.model.CouponIssueHistory;
 import com.coupop.fcfscoupon.domain.coupon.testconfig.CouponIntegrationTestConfig;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.function.Function;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +61,7 @@ class CouponServiceTest extends CouponIntegrationTestConfig {
         couponService.createAndSend(1L, email);
 
         // when
-        final List<CouponIssueHistory> histories = couponService.findHistoryByEmail(email, found -> found);
+        final List<CouponIssueHistory> histories = couponService.findHistoryByEmail(email, Function.identity());
 
         // then
         assertThat(histories).hasSize(1);
@@ -71,7 +72,7 @@ class CouponServiceTest extends CouponIntegrationTestConfig {
     @Test
     void findHistoryByEmail_ifHistoryNotFound() {
         assertThatExceptionOfType(HistoryNotFoundException.class)
-                .isThrownBy(() -> couponService.findHistoryByEmail("foo@bar.com", found -> found));
+                .isThrownBy(() -> couponService.findHistoryByEmail("foo@bar.com", Function.identity()));
     }
 
     @DisplayName("이미 발급된 쿠폰에 대해 재전송을 요청하면 같은 이메일로 재전송한다.")
