@@ -1,12 +1,12 @@
 package com.coupop.api;
 
+import com.coupop.api.dto.HistoryRequest;
 import com.coupop.api.dto.IssuanceRequest;
+import com.coupop.api.dto.ResendRequest;
 import com.coupop.api.support.RequestTime;
 import com.coupop.core.exception.ApiException;
 import com.coupop.coupon.CouponService;
-import com.coupop.coupon.dto.HistoryRequest;
 import com.coupop.coupon.dto.HistoryResponse;
-import com.coupop.coupon.dto.ResendRequest;
 import com.coupop.fcfsissue.FcfsIssueService;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
@@ -44,13 +44,13 @@ public class CouponController {
     @GetMapping("/history")
     @ResponseStatus(HttpStatus.OK)
     public HistoryResponse findHistoryByEmail(@RequestBody @Validated final HistoryRequest request) {
-        return couponService.findHistoryByEmail(request);
+        return couponService.findHistoryByEmail(request.email());
     }
 
     @PostMapping("/resend")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void resend(@RequestBody final ResendRequest request) {
-        couponService.resend(request);
+        couponService.resend(request.historyId());
     }
 
     @ExceptionHandler(ApiException.class)

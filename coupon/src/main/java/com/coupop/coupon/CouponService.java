@@ -1,8 +1,6 @@
 package com.coupop.coupon;
 
-import com.coupop.coupon.dto.HistoryRequest;
 import com.coupop.coupon.dto.HistoryResponse;
-import com.coupop.coupon.dto.ResendRequest;
 import com.coupop.coupon.exception.HistoryNotFoundException;
 import com.coupop.coupon.model.Coupon;
 import com.coupop.coupon.model.CouponEmailSender;
@@ -40,8 +38,7 @@ public class CouponService {
         couponEmailSender.send(coupon, email);
     }
 
-    public HistoryResponse findHistoryByEmail(final HistoryRequest request) {
-        final String email = request.email();
+    public HistoryResponse findHistoryByEmail(final String email) {
         final List<CouponIssueHistory> historyList = couponIssueHistoryRepository.findByEmail(email);
         if (historyList.isEmpty()) {
             throw HistoryNotFoundException.ofEmail(email);
@@ -49,8 +46,7 @@ public class CouponService {
         return HistoryResponse.of(historyList);
     }
 
-    public void resend(final ResendRequest request) {
-        final String historyId = request.historyId();
+    public void resend(final String historyId) {
         final Optional<CouponIssueHistory> found = couponIssueHistoryRepository.findById(historyId);
         if (found.isEmpty()) {
             throw HistoryNotFoundException.ofId(historyId);

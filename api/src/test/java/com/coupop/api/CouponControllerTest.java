@@ -11,13 +11,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.coupop.api.dto.HistoryRequest;
 import com.coupop.api.dto.IssuanceRequest;
+import com.coupop.api.dto.ResendRequest;
 import com.coupop.api.support.RequestTime;
 import com.coupop.coupon.CouponService;
-import com.coupop.coupon.dto.HistoryRequest;
 import com.coupop.coupon.dto.HistoryResponse;
 import com.coupop.coupon.dto.IssuedCouponResponse;
-import com.coupop.coupon.dto.ResendRequest;
 import com.coupop.coupon.exception.HistoryNotFoundException;
 import com.coupop.fcfsissue.FcfsIssueService;
 import com.coupop.fcfsissue.exception.CouponNotOpenedException;
@@ -150,7 +150,7 @@ class CouponControllerTest {
         final HistoryResponse response = new HistoryResponse(
                 List.of(new IssuedCouponResponse("fakeid", "2023-05-21")));
 
-        given(couponService.findHistoryByEmail(any(HistoryRequest.class)))
+        given(couponService.findHistoryByEmail(email))
                 .willReturn(response);
         // when
         final ResultActions resultActions = performGet("/history", request);
@@ -171,7 +171,7 @@ class CouponControllerTest {
         final HistoryRequest request = new HistoryRequest(email);
 
         doThrow(HistoryNotFoundException.ofEmail(email))
-                .when(couponService).findHistoryByEmail(any(HistoryRequest.class));
+                .when(couponService).findHistoryByEmail(email);
 
         // when
         final ResultActions resultActions = performGet("/history", request);
@@ -204,7 +204,7 @@ class CouponControllerTest {
         final ResendRequest request = new ResendRequest(invalidId);
 
         doThrow(HistoryNotFoundException.ofId(invalidId))
-                .when(couponService).resend(any(ResendRequest.class));
+                .when(couponService).resend(invalidId);
 
         // when
         final ResultActions resultActions = performPost("/resend", request);
