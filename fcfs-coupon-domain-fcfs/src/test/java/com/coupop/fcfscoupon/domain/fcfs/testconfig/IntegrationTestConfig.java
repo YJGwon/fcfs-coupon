@@ -1,13 +1,11 @@
-package com.coupop.testconfig;
+package com.coupop.fcfscoupon.domain.fcfs.testconfig;
 
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
-import com.coupop.api.support.RequestTime;
 import com.coupop.fcfscoupon.domain.coupon.model.CouponEmailSender;
 import com.coupop.fcfscoupon.domain.coupon.model.RandomCodeGenerator;
-import com.coupop.fcfscoupon.domain.fcfs.model.FcfsIssuePolicy;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,9 +20,6 @@ public abstract class IntegrationTestConfig {
     protected DatabaseSetUp databaseSetUp;
 
     @MockBean
-    protected RequestTime requestTime;
-
-    @MockBean
     protected RandomCodeGenerator codeGenerator;
 
     @MockBean
@@ -33,9 +28,6 @@ public abstract class IntegrationTestConfig {
     @BeforeEach
     void integrationSetup() {
         databaseSetUp.cleanRedis();
-
-        given(requestTime.getValue())
-                .willReturn(FcfsIssuePolicy.getOpenAt());
 
         given(codeGenerator.generate(anyLong()))
                 .willReturn(MOCKED_COUPON_VALUE);
