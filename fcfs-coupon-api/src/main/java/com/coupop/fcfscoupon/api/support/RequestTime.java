@@ -1,4 +1,4 @@
-package com.coupop.api.support;
+package com.coupop.fcfscoupon.api.support;
 
 import java.time.LocalTime;
 import org.springframework.context.annotation.Scope;

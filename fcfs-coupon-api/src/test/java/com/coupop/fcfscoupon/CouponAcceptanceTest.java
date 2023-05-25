@@ -1,4 +1,4 @@
-package com.coupop;
+package com.coupop.fcfscoupon;
 
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
@@ -9,12 +9,12 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
-import com.coupop.api.dto.HistoryRequest;
-import com.coupop.api.dto.HistoryResponse;
-import com.coupop.api.dto.IssuanceRequest;
-import com.coupop.api.dto.ResendRequest;
+import com.coupop.fcfscoupon.api.dto.HistoryRequest;
+import com.coupop.fcfscoupon.api.dto.HistoryResponse;
+import com.coupop.fcfscoupon.api.dto.IssuanceRequest;
+import com.coupop.fcfscoupon.api.dto.ResendRequest;
 import com.coupop.fcfscoupon.domain.fcfs.model.FcfsIssuePolicy;
-import com.coupop.testconfig.IntegrationTestConfig;
+import com.coupop.fcfscoupon.api.testconfig.IntegrationTestConfig;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
