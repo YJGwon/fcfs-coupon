@@ -1,29 +1,24 @@
-package com.coupop.fcfscoupon.api.fcfs.testconfig;
+package com.coupop.fcfscoupon.api.coupon.testconfig;
 
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
-import com.coupop.fcfscoupon.FcfsCouponApplication;
-import com.coupop.fcfscoupon.api.fcfs.support.RequestTime;
+import com.coupop.fcfscoupon.CouponApplication;
 import com.coupop.fcfscoupon.domain.coupon.model.CouponEmailSender;
 import com.coupop.fcfscoupon.domain.coupon.model.RandomCodeGenerator;
-import com.coupop.fcfscoupon.domain.fcfs.model.FcfsIssuePolicy;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-@SpringBootTest(classes = FcfsCouponApplication.class)
+@SpringBootTest(classes = CouponApplication.class)
 public abstract class IntegrationTestConfig {
 
     protected static final String MOCKED_COUPON_VALUE = "fakevalue";
 
     @Autowired
-    protected DatabaseSetUp databaseSetUp;
-
-    @MockBean
-    protected RequestTime requestTime;
+    protected MongoDatabaseCleaner databaseCleaner;
 
     @MockBean
     protected RandomCodeGenerator codeGenerator;
@@ -33,10 +28,7 @@ public abstract class IntegrationTestConfig {
 
     @BeforeEach
     void integrationSetup() {
-        databaseSetUp.cleanRedis();
-
-        given(requestTime.getValue())
-                .willReturn(FcfsIssuePolicy.getOpenAt());
+        databaseCleaner.clean();
 
         given(codeGenerator.generate(anyLong()))
                 .willReturn(MOCKED_COUPON_VALUE);
