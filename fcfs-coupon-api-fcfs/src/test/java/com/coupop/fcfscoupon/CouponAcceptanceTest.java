@@ -9,12 +9,12 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
-import com.coupop.fcfscoupon.api.dto.HistoryRequest;
-import com.coupop.fcfscoupon.api.dto.HistoryResponse;
-import com.coupop.fcfscoupon.api.dto.IssuanceRequest;
-import com.coupop.fcfscoupon.api.dto.ResendRequest;
+import com.coupop.fcfscoupon.api.fcfs.dto.HistoryRequest;
+import com.coupop.fcfscoupon.api.fcfs.dto.HistoryResponse;
+import com.coupop.fcfscoupon.api.fcfs.dto.IssuanceRequest;
+import com.coupop.fcfscoupon.api.fcfs.dto.ResendRequest;
 import com.coupop.fcfscoupon.domain.fcfs.model.FcfsIssuePolicy;
-import com.coupop.fcfscoupon.api.testconfig.IntegrationTestConfig;
+import com.coupop.fcfscoupon.api.fcfs.testconfig.IntegrationTestConfig;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;

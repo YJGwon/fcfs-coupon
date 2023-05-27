@@ -1,4 +1,4 @@
-package com.coupop.fcfscoupon.api.dto;
+package com.coupop.fcfscoupon.api.fcfs.dto;
 
 import com.coupop.fcfscoupon.domain.coupon.model.CouponIssueHistory;
 import java.util.List;

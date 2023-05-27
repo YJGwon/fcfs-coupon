@@ -1,4 +1,4 @@
-package com.coupop.fcfscoupon.api.testconfig;
+package com.coupop.fcfscoupon.api.fcfs.testconfig;
 
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;

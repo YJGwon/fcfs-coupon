@@ -1,10 +1,10 @@
-package com.coupop.fcfscoupon.api.testconfig;
+package com.coupop.fcfscoupon.api.fcfs.testconfig;
 
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
-import com.coupop.fcfscoupon.api.support.RequestTime;
+import com.coupop.fcfscoupon.api.fcfs.support.RequestTime;
 import com.coupop.fcfscoupon.domain.coupon.model.CouponEmailSender;
 import com.coupop.fcfscoupon.domain.coupon.model.RandomCodeGenerator;
 import com.coupop.fcfscoupon.domain.fcfs.model.FcfsIssuePolicy;

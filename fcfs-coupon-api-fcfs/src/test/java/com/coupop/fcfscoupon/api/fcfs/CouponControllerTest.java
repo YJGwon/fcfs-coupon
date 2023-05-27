@@ -1,4 +1,4 @@
-package com.coupop.fcfscoupon.api;
+package com.coupop.fcfscoupon.api.fcfs;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
@@ -11,12 +11,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.coupop.fcfscoupon.api.dto.HistoryRequest;
-import com.coupop.fcfscoupon.api.dto.HistoryResponse;
-import com.coupop.fcfscoupon.api.dto.IssuanceRequest;
-import com.coupop.fcfscoupon.api.dto.IssuedCouponResponse;
-import com.coupop.fcfscoupon.api.dto.ResendRequest;
-import com.coupop.fcfscoupon.api.support.RequestTime;
+import com.coupop.fcfscoupon.api.fcfs.dto.HistoryRequest;
+import com.coupop.fcfscoupon.api.fcfs.dto.HistoryResponse;
+import com.coupop.fcfscoupon.api.fcfs.dto.IssuanceRequest;
+import com.coupop.fcfscoupon.api.fcfs.dto.IssuedCouponResponse;
+import com.coupop.fcfscoupon.api.fcfs.dto.ResendRequest;
+import com.coupop.fcfscoupon.api.fcfs.support.RequestTime;
 import com.coupop.fcfscoupon.domain.coupon.CouponService;
 import com.coupop.fcfscoupon.domain.coupon.exception.HistoryNotFoundException;
 import com.coupop.fcfscoupon.domain.fcfs.FcfsIssueService;

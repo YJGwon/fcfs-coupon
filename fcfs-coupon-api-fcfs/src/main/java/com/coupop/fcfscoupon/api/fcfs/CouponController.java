@@ -1,10 +1,10 @@
-package com.coupop.fcfscoupon.api;
+package com.coupop.fcfscoupon.api.fcfs;
 
-import com.coupop.fcfscoupon.api.dto.HistoryRequest;
-import com.coupop.fcfscoupon.api.dto.HistoryResponse;
-import com.coupop.fcfscoupon.api.dto.IssuanceRequest;
-import com.coupop.fcfscoupon.api.dto.ResendRequest;
-import com.coupop.fcfscoupon.api.support.RequestTime;
+import com.coupop.fcfscoupon.api.fcfs.dto.HistoryRequest;
+import com.coupop.fcfscoupon.api.fcfs.dto.HistoryResponse;
+import com.coupop.fcfscoupon.api.fcfs.dto.IssuanceRequest;
+import com.coupop.fcfscoupon.api.fcfs.dto.ResendRequest;
+import com.coupop.fcfscoupon.api.fcfs.support.RequestTime;
 import com.coupop.fcfscoupon.common.exception.ApiException;
 import com.coupop.fcfscoupon.domain.coupon.CouponService;
 import com.coupop.fcfscoupon.domain.fcfs.FcfsIssueService;
