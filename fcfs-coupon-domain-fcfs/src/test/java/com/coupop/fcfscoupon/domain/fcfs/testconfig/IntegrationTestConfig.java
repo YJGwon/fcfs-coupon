@@ -1,11 +1,7 @@
 package com.coupop.fcfscoupon.domain.fcfs.testconfig;
 
 
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.given;
-
-import com.coupop.fcfscoupon.domain.coupon.model.CouponEmailSender;
-import com.coupop.fcfscoupon.domain.coupon.model.RandomCodeGenerator;
+import com.coupop.fcfscoupon.client.coupon.CouponWebService;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,16 +16,10 @@ public abstract class IntegrationTestConfig {
     protected DatabaseSetUp databaseSetUp;
 
     @MockBean
-    protected RandomCodeGenerator codeGenerator;
-
-    @MockBean
-    protected CouponEmailSender couponEmailSender;
+    protected CouponWebService couponWebService;
 
     @BeforeEach
     void integrationSetup() {
-        databaseSetUp.cleanRedis();
-
-        given(codeGenerator.generate(anyLong()))
-                .willReturn(MOCKED_COUPON_VALUE);
+        databaseSetUp.clean();
     }
 }

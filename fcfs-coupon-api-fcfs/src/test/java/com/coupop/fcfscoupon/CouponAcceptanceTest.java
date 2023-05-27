@@ -10,11 +10,11 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
 import com.coupop.fcfscoupon.api.fcfs.dto.HistoryRequest;
-import com.coupop.fcfscoupon.api.fcfs.dto.HistoryResponse;
 import com.coupop.fcfscoupon.api.fcfs.dto.IssuanceRequest;
 import com.coupop.fcfscoupon.api.fcfs.dto.ResendRequest;
-import com.coupop.fcfscoupon.domain.fcfs.model.FcfsIssuePolicy;
 import com.coupop.fcfscoupon.api.fcfs.testconfig.IntegrationTestConfig;
+import com.coupop.fcfscoupon.domain.coupon.model.CouponIssueHistory;
+import com.coupop.fcfscoupon.domain.fcfs.model.FcfsIssuePolicy;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
@@ -121,7 +121,7 @@ public class CouponAcceptanceTest extends IntegrationTestConfig {
     void findHistoryByEmail() {
         // given
         final String email = "foo@bar.com";
-        post("/issue", new IssuanceRequest(email));
+        databaseSetUp.addHistory(email);
 
         final HistoryRequest request = new HistoryRequest(email);
 
@@ -153,14 +153,8 @@ public class CouponAcceptanceTest extends IntegrationTestConfig {
     void resend() {
         // given
         final String email = "foo@bar.com";
-        post("/issue", new IssuanceRequest(email));
-        final HistoryResponse history = get("/history", new HistoryRequest(email))
-                .extract()
-                .body()
-                .as(HistoryResponse.class);
-        final String historyId = history.issuedCoupons()
-                .get(0)
-                .id();
+        final CouponIssueHistory history = databaseSetUp.addHistory(email);
+        final String historyId = history.getId();
 
         final ResendRequest request = new ResendRequest(historyId);
 
