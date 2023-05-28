@@ -30,7 +30,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class CouponAcceptanceTest extends IntegrationTestConfig {
+public class FcfsAcceptanceTest extends IntegrationTestConfig {
 
     @LocalServerPort
     private int port;

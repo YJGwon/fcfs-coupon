@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class FcfsCouponApplication {
+public class FcfsApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(FcfsCouponApplication.class, args);
+        SpringApplication.run(FcfsApplication.class, args);
     }
 
 }

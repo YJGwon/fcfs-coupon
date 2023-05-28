@@ -41,7 +41,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 @WebMvcTest
 @Import(RequestTime.class)
-class CouponControllerTest {
+class FcfsControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

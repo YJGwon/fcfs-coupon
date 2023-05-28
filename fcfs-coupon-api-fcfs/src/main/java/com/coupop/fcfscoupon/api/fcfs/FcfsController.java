@@ -21,15 +21,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class CouponController {
+public class FcfsController {
 
     private final FcfsIssueService fcfsIssueService;
     private final CouponService couponService;
     private final RequestTime requestTime;
 
-    public CouponController(final FcfsIssueService fcfsIssueService,
-                            final CouponService couponService,
-                            final RequestTime requestTime) {
+    public FcfsController(final FcfsIssueService fcfsIssueService,
+                          final CouponService couponService,
+                          final RequestTime requestTime) {
         this.fcfsIssueService = fcfsIssueService;
         this.couponService = couponService;
         this.requestTime = requestTime;
