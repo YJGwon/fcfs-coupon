@@ -1,5 +1,6 @@
 package com.coupop.fcfscoupon.domain.coupon;
 
+import com.coupop.fcfscoupon.domain.coupon.exception.CouponNotFoundException;
 import com.coupop.fcfscoupon.domain.coupon.exception.HistoryNotFoundException;
 import com.coupop.fcfscoupon.domain.coupon.model.Coupon;
 import com.coupop.fcfscoupon.domain.coupon.model.CouponEmailSender;
@@ -33,7 +34,7 @@ public class CouponService {
 
     public void createAndSend(final Long sequence, final String email) {
         final Coupon coupon = new Coupon(codeGenerator.generate(sequence));
-        couponRepository.save(coupon);
+        couponRepository.insert(coupon);
         couponIssueHistoryRepository.save(CouponIssueHistory.ofNew(email, coupon));
         couponEmailSender.send(coupon, email);
     }
@@ -53,6 +54,15 @@ public class CouponService {
             throw HistoryNotFoundException.ofId(historyId);
         }
         final CouponIssueHistory history = found.get();
-        couponEmailSender.send(history.getCoupon(), history.getEmail());
+        send(history.getCoupon().getId(), history.getEmail());
+    }
+
+    public void send(final String couponId, final String email) {
+        final Optional<Coupon> found = couponRepository.findById(couponId);
+        if (found.isEmpty()) {
+            throw new CouponNotFoundException(couponId);
+        }
+        final Coupon coupon = found.get();
+        couponEmailSender.send(coupon, email);
     }
 }

@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
+import com.coupop.fcfscoupon.domain.coupon.exception.CouponNotFoundException;
 import com.coupop.fcfscoupon.domain.coupon.exception.HistoryNotFoundException;
 import com.coupop.fcfscoupon.domain.coupon.model.Coupon;
 import com.coupop.fcfscoupon.domain.coupon.model.CouponIssueHistory;
@@ -97,5 +98,28 @@ class CouponServiceTest extends CouponIntegrationTestConfig {
     void resend_ifHistoryNotFound() {
         assertThatExceptionOfType(HistoryNotFoundException.class)
                 .isThrownBy(() -> couponService.resend("invalidId"));
+    }
+
+    @DisplayName("쿠폰을 이메일로 발송한다.")
+    @Test
+    void send() {
+        // given
+        final String email = "foo@bar.com";
+        couponService.createAndSend(1L, email);
+        final Coupon saved = mongoTemplate.findOne(query(where("value").is(MOCKED_COUPON_VALUE)), Coupon.class);
+
+        // when & then
+        assertAll(
+                () -> assertThatNoException()
+                        .isThrownBy(() -> couponService.send(saved.getId(), email)),
+                () -> verify(couponEmailSender, times(2)).send(any(Coupon.class), eq(email))
+        );
+    }
+
+    @DisplayName("쿠폰 전송을 요청할 때 해당하는 쿠폰이 없을 경우 예외가 발생한다.")
+    @Test
+    void send_ifCouponNotFound() {
+        assertThatExceptionOfType(CouponNotFoundException.class)
+                .isThrownBy(() -> couponService.send("invalidId", "foo@bar.com"));
     }
 }
