@@ -6,8 +6,10 @@ import com.coupop.fcfscoupon.api.fcfs.dto.IssuanceRequest;
 import com.coupop.fcfscoupon.api.fcfs.dto.ResendRequest;
 import com.coupop.fcfscoupon.api.fcfs.support.RequestTime;
 import com.coupop.fcfscoupon.common.exception.ApiException;
-import com.coupop.fcfscoupon.domain.coupon.CouponService;
 import com.coupop.fcfscoupon.domain.fcfs.FcfsIssueService;
+import com.coupop.fcfscoupon.domain.history.HistoryService;
+import com.coupop.fcfscoupon.domain.history.dto.CouponIssueHistoryRecord;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
@@ -24,14 +26,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class FcfsController {
 
     private final FcfsIssueService fcfsIssueService;
-    private final CouponService couponService;
+    private final HistoryService historyService;
     private final RequestTime requestTime;
 
     public FcfsController(final FcfsIssueService fcfsIssueService,
-                          final CouponService couponService,
+                          final HistoryService historyService,
                           final RequestTime requestTime) {
         this.fcfsIssueService = fcfsIssueService;
-        this.couponService = couponService;
+        this.historyService = historyService;
         this.requestTime = requestTime;
     }
 
@@ -44,13 +46,14 @@ public class FcfsController {
     @GetMapping("/history")
     @ResponseStatus(HttpStatus.OK)
     public HistoryResponse findHistoryByEmail(@RequestBody @Validated final HistoryRequest request) {
-        return couponService.findHistoryByEmail(request.email(), HistoryResponse::of);
+        final List<CouponIssueHistoryRecord> issueHistoryRecords = historyService.findByEmail(request.email());
+        return HistoryResponse.of(issueHistoryRecords);
     }
 
     @PostMapping("/resend")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void resend(@RequestBody final ResendRequest request) {
-        couponService.resend(request.historyId());
+        historyService.resend(request.historyId());
     }
 
     @ExceptionHandler(ApiException.class)

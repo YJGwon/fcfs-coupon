@@ -15,10 +15,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 @SpringBootTest(classes = FcfsApplication.class)
 public abstract class IntegrationTestConfig {
 
-    protected static final String MOCKED_COUPON_VALUE = "fakevalue";
-
     @Autowired
-    protected DatabaseSetUp databaseSetUp;
+    protected DataSetup dataSetup;
 
     @MockBean
     protected RequestTime requestTime;
@@ -28,7 +26,7 @@ public abstract class IntegrationTestConfig {
 
     @BeforeEach
     void integrationSetup() {
-        databaseSetUp.cleanRedis();
+        dataSetup.cleanRedis();
 
         given(requestTime.getValue())
                 .willReturn(FcfsIssuePolicy.getOpenAt());

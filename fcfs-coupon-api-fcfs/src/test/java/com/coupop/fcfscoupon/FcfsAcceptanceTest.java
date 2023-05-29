@@ -13,8 +13,8 @@ import com.coupop.fcfscoupon.api.fcfs.dto.HistoryRequest;
 import com.coupop.fcfscoupon.api.fcfs.dto.IssuanceRequest;
 import com.coupop.fcfscoupon.api.fcfs.dto.ResendRequest;
 import com.coupop.fcfscoupon.api.fcfs.testconfig.IntegrationTestConfig;
-import com.coupop.fcfscoupon.domain.coupon.model.CouponIssueHistory;
 import com.coupop.fcfscoupon.domain.fcfs.model.FcfsIssuePolicy;
+import com.coupop.fcfscoupon.domain.history.model.CouponIssueHistory;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
@@ -106,7 +106,7 @@ public class FcfsAcceptanceTest extends IntegrationTestConfig {
     void issueCoupon_ifCouponOutOfStock() {
         // given
         final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
-        databaseSetUp.setCount(FcfsIssuePolicy.getLimit());
+        dataSetup.setCount(FcfsIssuePolicy.getLimit());
 
         // when
         final ValidatableResponse response = post("/issue", request);
@@ -121,7 +121,7 @@ public class FcfsAcceptanceTest extends IntegrationTestConfig {
     void findHistoryByEmail() {
         // given
         final String email = "foo@bar.com";
-        databaseSetUp.addHistory(email);
+        dataSetup.addHistory(email);
 
         final HistoryRequest request = new HistoryRequest(email);
 
@@ -153,7 +153,7 @@ public class FcfsAcceptanceTest extends IntegrationTestConfig {
     void resend() {
         // given
         final String email = "foo@bar.com";
-        final CouponIssueHistory history = databaseSetUp.addHistory(email);
+        final CouponIssueHistory history = dataSetup.addHistory(email);
         final String historyId = history.getId();
 
         final ResendRequest request = new ResendRequest(historyId);
