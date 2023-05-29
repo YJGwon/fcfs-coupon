@@ -1,4 +1,6 @@
 dependencies {
+    implementation(project(":fcfs-coupon-api-coupon-dto"))
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
     // webflux

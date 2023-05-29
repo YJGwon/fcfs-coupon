@@ -1,5 +1,6 @@
 package com.coupop.fcfscoupon.client.coupon;
 
+import com.coupop.fcfscoupon.api.coupon.dto.IssuanceRequest;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.service.annotation.PostExchange;
 
