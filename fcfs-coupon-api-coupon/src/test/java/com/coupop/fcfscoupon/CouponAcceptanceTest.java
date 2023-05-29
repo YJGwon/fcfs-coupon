@@ -3,9 +3,12 @@ package com.coupop.fcfscoupon;
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import com.coupop.fcfscoupon.api.coupon.dto.IssuanceRequest;
+import com.coupop.fcfscoupon.api.coupon.dto.SendRequest;
 import com.coupop.fcfscoupon.api.coupon.testconfig.IntegrationTestConfig;
+import com.coupop.fcfscoupon.domain.coupon.model.Coupon;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
@@ -55,6 +58,50 @@ public class CouponAcceptanceTest extends IntegrationTestConfig {
         // then
         response.statusCode(BAD_REQUEST.value())
                 .body("title", equalTo("형식에 맞는 이메일을 입력하세요."));
+    }
+
+    @DisplayName("저장된 쿠폰을 발송한다.")
+    @Test
+    void sendCoupon() {
+        // given
+        final Coupon coupon = dataSetup.addCoupon();
+        final SendRequest request = new SendRequest(coupon.getId(), "foo@bar.com");
+
+        // when
+        final ValidatableResponse response = post("/send", request);
+
+        // then
+        response.statusCode(ACCEPTED.value());
+    }
+
+    @DisplayName("형식에 맞지 않는 이메일을 입력하면 쿠폰을 발송할 수 없다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"foobar.com", "foo@", "foo@com"})
+    void sendCoupon_ifEmailInvalid(final String invalidEmail) {
+        // given
+        final Coupon coupon = dataSetup.addCoupon();
+        final SendRequest request = new SendRequest(coupon.getId(), invalidEmail);
+
+        // when
+        final ValidatableResponse response = post("/send", request);
+
+        // then
+        response.statusCode(BAD_REQUEST.value())
+                .body("title", equalTo("형식에 맞는 이메일을 입력하세요."));
+    }
+
+    @DisplayName("존재하지 않는 쿠폰을 발송할 수 없다.")
+    @Test
+    void sendCoupon_ifCouponNotFound() {
+        // given
+        final SendRequest request = new SendRequest("invalidId", "foo@bar.com");
+
+        // when
+        final ValidatableResponse response = post("/send", request);
+
+        // then
+        response.statusCode(NOT_FOUND.value())
+                .body("title", equalTo("쿠폰이 존재하지 않습니다."));
     }
 
     private ValidatableResponse post(final String url, final Object request) {

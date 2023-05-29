@@ -1,6 +1,8 @@
 package com.coupop.fcfscoupon.api.coupon;
 
 import com.coupop.fcfscoupon.api.coupon.dto.IssuanceRequest;
+import com.coupop.fcfscoupon.api.coupon.dto.SendRequest;
+import com.coupop.fcfscoupon.common.exception.ApiException;
 import com.coupop.fcfscoupon.domain.coupon.CouponService;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
@@ -26,6 +28,20 @@ public class CouponController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void issue(@RequestBody @Validated final IssuanceRequest request) {
         couponService.createAndSend(request.seq(), request.email());
+    }
+
+    @PostMapping("/send")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void send(@RequestBody @Validated final SendRequest request) {
+        couponService.send(request.couponId(), request.email());
+    }
+
+    @ExceptionHandler(ApiException.class)
+    public ErrorResponse handleApiExceptions(final ApiException e) {
+        return ErrorResponse.builder(e, e.getHttpStatus(), e.getMessage())
+                .type(e.getType())
+                .title(e.getTitle())
+                .build();
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

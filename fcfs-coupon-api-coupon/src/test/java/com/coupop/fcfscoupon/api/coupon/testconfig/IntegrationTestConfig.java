@@ -18,7 +18,7 @@ public abstract class IntegrationTestConfig {
     protected static final String MOCKED_COUPON_VALUE = "fakevalue";
 
     @Autowired
-    protected MongoDatabaseCleaner databaseCleaner;
+    protected DataSetup dataSetup;
 
     @MockBean
     protected RandomCodeGenerator codeGenerator;
@@ -28,7 +28,7 @@ public abstract class IntegrationTestConfig {
 
     @BeforeEach
     void integrationSetup() {
-        databaseCleaner.clean();
+        dataSetup.clean();
 
         given(codeGenerator.generate(anyLong()))
                 .willReturn(MOCKED_COUPON_VALUE);
