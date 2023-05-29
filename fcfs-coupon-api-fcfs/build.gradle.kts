@@ -11,4 +11,6 @@ dependencies {
 
     // rest-assured
     testImplementation("io.rest-assured:rest-assured:5.3.0")
+
+    testImplementation(project(":fcfs-coupon-client-coupon"));
 }

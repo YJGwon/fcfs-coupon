@@ -9,19 +9,15 @@ public class DatabaseSetUp {
 
     private final StringRedisTemplate redisTemplate;
     private final FcfsIssueRepository fcfsIssueRepository;
-    private final MongoDatabaseCleaner mongoDatabaseCleaner;
 
     public DatabaseSetUp(final StringRedisTemplate redisTemplate,
-                         final FcfsIssueRepository fcfsIssueRepository,
-                         final MongoDatabaseCleaner mongoDatabaseCleaner) {
+                         final FcfsIssueRepository fcfsIssueRepository) {
         this.redisTemplate = redisTemplate;
         this.fcfsIssueRepository = fcfsIssueRepository;
-        this.mongoDatabaseCleaner = mongoDatabaseCleaner;
     }
 
-    public void cleanRedis() {
+    public void clean() {
         redisTemplate.delete(redisTemplate.keys("*"));
-        mongoDatabaseCleaner.clean();
     }
 
     public void setCount(int count) {
