@@ -26,10 +26,10 @@ class FcfsIssueServiceTest {
     private FcfsIssueService fcfsIssueService;
 
     @Autowired
-    protected DataSetup dataSetup;
+    private DataSetup dataSetup;
 
     @MockBean
-    protected CouponService couponService;
+    private CouponService couponService;
 
     @BeforeEach
     void setUp() {
