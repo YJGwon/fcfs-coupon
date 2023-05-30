@@ -1,6 +1,6 @@
 package com.coupop.fcfscoupon.domain.fcfs;
 
-import com.coupop.fcfscoupon.client.coupon.CouponWebService;
+import com.coupop.fcfscoupon.client.coupon.CouponService;
 import com.coupop.fcfscoupon.domain.fcfs.exception.CouponNotOpenedException;
 import com.coupop.fcfscoupon.domain.fcfs.exception.CouponOutOfStockException;
 import com.coupop.fcfscoupon.domain.fcfs.exception.EmailAlreadyUsedException;
@@ -14,15 +14,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class FcfsIssueService {
 
-    private final CouponWebService couponWebService;
+    private final CouponService couponService;
 
     private final RedisFcfsIssueRepository redisFcfsIssueRepository;
     private final TransactionalRedisOperations transactionalRedisOperations;
 
-    public FcfsIssueService(final CouponWebService couponWebService,
+    public FcfsIssueService(final CouponService couponService,
                             final RedisFcfsIssueRepository redisFcfsIssueRepository,
                             final TransactionalRedisOperations transactionalRedisOperations) {
-        this.couponWebService = couponWebService;
+        this.couponService = couponService;
         this.redisFcfsIssueRepository = redisFcfsIssueRepository;
         this.transactionalRedisOperations = transactionalRedisOperations;
     }
@@ -31,7 +31,7 @@ public class FcfsIssueService {
         checkCouponOpen(requestTime);
         final Long sequence = checkIssuableAndGetSequence(email);
 
-        couponWebService.issue(sequence, email);
+        couponService.issue(sequence, email);
     }
 
     private Long checkIssuableAndGetSequence(final String email) {

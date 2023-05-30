@@ -17,9 +17,9 @@ import org.springframework.web.reactive.function.client.support.WebClientAdapter
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 @SpringBootTest
-class CouponWebServiceTest {
+class CouponServiceTest {
 
-    private CouponWebService couponWebService;
+    private CouponService couponService;
     private MockWebServer mockWebServer;
 
     @BeforeEach
@@ -31,7 +31,7 @@ class CouponWebServiceTest {
                 .build();
         final HttpServiceProxyFactory factory = HttpServiceProxyFactory.builder(WebClientAdapter.forClient(client))
                 .build();
-        couponWebService = factory.createClient(CouponWebService.class);
+        couponService = new CouponService(factory.createClient(CouponWebService.class));
     }
 
     @AfterEach
@@ -42,13 +42,13 @@ class CouponWebServiceTest {
     @DisplayName("설정된 url로 쿠폰 발급 요청을 전송한다.")
     @Test
     void issue() {
-        couponWebService.issue(1L, "foo@bar.com");
+        couponService.issue(1L, "foo@bar.com");
     }
 
     @DisplayName("설정된 url로 쿠폰 재발송 요청을 전송한다.")
     @Test
-    void send() {
-        couponWebService.resend("fakeId");
+    void resend() {
+        couponService.resend("fakeId");
     }
 
     private MockWebServer startServer() {

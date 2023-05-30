@@ -5,13 +5,13 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DatabaseSetUp {
+public class DataSetup {
 
     private final StringRedisTemplate redisTemplate;
     private final FcfsIssueRepository fcfsIssueRepository;
 
-    public DatabaseSetUp(final StringRedisTemplate redisTemplate,
-                         final FcfsIssueRepository fcfsIssueRepository) {
+    public DataSetup(final StringRedisTemplate redisTemplate,
+                     final FcfsIssueRepository fcfsIssueRepository) {
         this.redisTemplate = redisTemplate;
         this.fcfsIssueRepository = fcfsIssueRepository;
     }
