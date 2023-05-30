@@ -1,6 +1,7 @@
 package com.coupop.fcfscoupon.api.coupon;
 
 import com.coupop.fcfscoupon.api.coupon.dto.IssuanceRequest;
+import com.coupop.fcfscoupon.api.coupon.dto.ResendRequest;
 import com.coupop.fcfscoupon.api.coupon.dto.SendRequest;
 import com.coupop.fcfscoupon.common.exception.ApiException;
 import com.coupop.fcfscoupon.domain.coupon.CouponService;
@@ -34,6 +35,12 @@ public class CouponController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void send(@RequestBody @Validated final SendRequest request) {
         couponService.send(request.couponId(), request.email());
+    }
+
+    @PostMapping("/resend")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void resend(@RequestBody @Validated final ResendRequest request) {
+        couponService.resend(request.historyId());
     }
 
     @ExceptionHandler(ApiException.class)

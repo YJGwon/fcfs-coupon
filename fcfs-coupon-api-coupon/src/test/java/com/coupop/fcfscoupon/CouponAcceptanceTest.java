@@ -1,18 +1,15 @@
 package com.coupop.fcfscoupon;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.given;
 import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import com.coupop.fcfscoupon.api.coupon.dto.IssuanceRequest;
-import com.coupop.fcfscoupon.api.coupon.dto.SendRequest;
+import com.coupop.fcfscoupon.api.coupon.dto.ResendRequest;
 import com.coupop.fcfscoupon.api.coupon.testconfig.DataSetup;
-import com.coupop.fcfscoupon.domain.coupon.model.Coupon;
 import com.coupop.fcfscoupon.domain.coupon.model.CouponEmailSender;
-import com.coupop.fcfscoupon.domain.coupon.model.RandomCodeGenerator;
+import com.coupop.fcfscoupon.domain.history.model.CouponIssueHistory;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
@@ -33,24 +30,16 @@ public class CouponAcceptanceTest {
     @LocalServerPort
     private int port;
 
-    protected static final String MOCKED_COUPON_VALUE = "fakevalue";
-
     @Autowired
-    protected DataSetup dataSetup;
+    private DataSetup dataSetup;
 
     @MockBean
-    protected RandomCodeGenerator codeGenerator;
-
-    @MockBean
-    protected CouponEmailSender couponEmailSender;
+    private CouponEmailSender couponEmailSender;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
         dataSetup.clean();
-
-        given(codeGenerator.generate(anyLong()))
-                .willReturn(MOCKED_COUPON_VALUE);
     }
 
     @DisplayName("쿠폰을 발급받는다.")
@@ -81,48 +70,47 @@ public class CouponAcceptanceTest {
                 .body("title", equalTo("형식에 맞는 이메일을 입력하세요."));
     }
 
-    @DisplayName("저장된 쿠폰을 발송한다.")
+    @DisplayName("발급 이력에 따라 쿠폰을 발송한다.")
     @Test
-    void sendCoupon() {
+    void resendCoupon() {
         // given
-        final Coupon coupon = dataSetup.addCoupon();
-        final SendRequest request = new SendRequest(coupon.getId(), "foo@bar.com");
+        final CouponIssueHistory history = dataSetup.addHistory(dataSetup.addCoupon().getId());
+        final ResendRequest request = new ResendRequest(history.getId());
 
         // when
-        final ValidatableResponse response = post("/send", request);
+        final ValidatableResponse response = post("/resend", request);
 
         // then
         response.statusCode(ACCEPTED.value());
     }
 
-    @DisplayName("형식에 맞지 않는 이메일을 입력하면 쿠폰을 발송할 수 없다.")
-    @ParameterizedTest
-    @ValueSource(strings = {"foobar.com", "foo@", "foo@com"})
-    void sendCoupon_ifEmailInvalid(final String invalidEmail) {
-        // given
-        final Coupon coupon = dataSetup.addCoupon();
-        final SendRequest request = new SendRequest(coupon.getId(), invalidEmail);
-
-        // when
-        final ValidatableResponse response = post("/send", request);
-
-        // then
-        response.statusCode(BAD_REQUEST.value())
-                .body("title", equalTo("형식에 맞는 이메일을 입력하세요."));
-    }
-
-    @DisplayName("존재하지 않는 쿠폰을 발송할 수 없다.")
+    @DisplayName("쿠폰이 존재하지 않으면 쿠폰을 재발송할 수 없다.")
     @Test
-    void sendCoupon_ifCouponNotFound() {
+    void resendCoupon_ifCouponNotFound() {
         // given
-        final SendRequest request = new SendRequest("invalidId", "foo@bar.com");
+        final CouponIssueHistory history = dataSetup.addHistory("invalidId");
+        final ResendRequest request = new ResendRequest(history.getId());
 
         // when
-        final ValidatableResponse response = post("/send", request);
+        final ValidatableResponse response = post("/resend", request);
 
         // then
         response.statusCode(NOT_FOUND.value())
                 .body("title", equalTo("쿠폰이 존재하지 않습니다."));
+    }
+
+    @DisplayName("발급 이력이 없으면 쿠폰을 재발송할 수 없다.")
+    @Test
+    void resendCoupon_ifHistoryNotFound() {
+        // given
+        final ResendRequest request = new ResendRequest("invalidId");
+
+        // when
+        final ValidatableResponse response = post("/resend", request);
+
+        // then
+        response.statusCode(NOT_FOUND.value())
+                .body("title", equalTo("쿠폰 발급 이력이 존재하지 않습니다."));
     }
 
     private ValidatableResponse post(final String url, final Object request) {

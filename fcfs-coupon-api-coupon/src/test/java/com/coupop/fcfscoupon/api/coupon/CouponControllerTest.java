@@ -7,9 +7,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.coupop.fcfscoupon.api.coupon.dto.IssuanceRequest;
-import com.coupop.fcfscoupon.api.coupon.dto.SendRequest;
+import com.coupop.fcfscoupon.api.coupon.dto.ResendRequest;
 import com.coupop.fcfscoupon.domain.coupon.CouponService;
 import com.coupop.fcfscoupon.domain.coupon.exception.CouponNotFoundException;
+import com.coupop.fcfscoupon.domain.history.exception.HistoryNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -64,54 +65,56 @@ class CouponControllerTest {
                 .andExpect(jsonPath("title").value("형식에 맞는 이메일을 입력하세요."));
     }
 
-    @DisplayName("쿠폰 발송에 성공하면 Accepted 상태를 반환한다.")
+    @DisplayName("쿠폰 재발송에 성공하면 Accepted 상태를 반환한다.")
     @Test
     void send() throws Exception {
         // given
-        final SendRequest request = new SendRequest("fakeId", "foo@bar.com");
+        final ResendRequest request = new ResendRequest("fakeId");
 
         // when
-        final ResultActions resultActions = performPost("/send", request);
+        final ResultActions resultActions = performPost("/resend", request);
 
         // then
         resultActions
                 .andExpect(status().isAccepted());
     }
 
-    @DisplayName("쿠폰 전송시, 이메일이 형식에 맞지 않으면 Bad Request 상태를 반환한다.")
-    @ParameterizedTest
-    @ValueSource(strings = {"foobar.com", "foo@", "foo@com"})
-    void send_responseError_ifEmailInvalid(final String invalidEmail) throws Exception {
-        // given
-        final SendRequest request = new SendRequest("fakeId", invalidEmail);
-
-        // when
-        final ResultActions resultActions = performPost("/send", request);
-
-        // then
-        resultActions
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("title").value("형식에 맞는 이메일을 입력하세요."));
-    }
-
-    @DisplayName("쿠폰 전송시, 쿠폰이 존재하지 않으면 Not Found 상태를 반환한다.")
+    @DisplayName("쿠폰 재발송시, 쿠폰이 존재하지 않으면 Not Found 상태를 반환한다.")
     @Test
     void send_responseError_ifCouponNotFound() throws Exception {
         // given
-        final String invalidId = "fakeId";
-        final String email = "foo@bar.com";
-        final SendRequest request = new SendRequest(invalidId, email);
-        doThrow(new CouponNotFoundException(invalidId))
+        final String historyId = "fakeId";
+        final ResendRequest request = new ResendRequest(historyId);
+        doThrow(new CouponNotFoundException("invalidId"))
                 .when(couponService)
-                .send(invalidId, email);
+                .resend(historyId);
 
         // when
-        final ResultActions resultActions = performPost("/send", request);
+        final ResultActions resultActions = performPost("/resend", request);
 
         // then
         resultActions
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("title").value("쿠폰이 존재하지 않습니다."));
+    }
+
+    @DisplayName("쿠폰 재발송시, 발급 이력이 존재하지 않으면 Not Found 상태를 반환한다.")
+    @Test
+    void send_responseError_ifHistoryNotFound() throws Exception {
+        // given
+        final String historyId = "invalidId";
+        final ResendRequest request = new ResendRequest(historyId);
+        doThrow(HistoryNotFoundException.ofId("invalidId"))
+                .when(couponService)
+                .resend(historyId);
+
+        // when
+        final ResultActions resultActions = performPost("/resend", request);
+
+        // then
+        resultActions
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("title").value("쿠폰 발급 이력이 존재하지 않습니다."));
     }
 
     private ResultActions performPost(final String url, final Object request) throws Exception {

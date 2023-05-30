@@ -45,10 +45,10 @@ class CouponWebServiceTest {
         couponWebService.issue(1L, "foo@bar.com");
     }
 
-    @DisplayName("설정된 url로 쿠폰 발송 요청을 전송한다.")
+    @DisplayName("설정된 url로 쿠폰 재발송 요청을 전송한다.")
     @Test
     void send() {
-        couponWebService.send("fakeId", "foo@bar.com");
+        couponWebService.resend("fakeId");
     }
 
     private MockWebServer startServer() {
@@ -62,7 +62,7 @@ class CouponWebServiceTest {
                 if (recordedRequest.getPath().contains("/issue")) {
                     return acceptedResponse;
                 }
-                if (recordedRequest.getPath().contains("/send")) {
+                if (recordedRequest.getPath().contains("/resend")) {
                     return acceptedResponse;
                 }
                 return new MockResponse().setResponseCode(HttpStatus.NOT_FOUND.value());
