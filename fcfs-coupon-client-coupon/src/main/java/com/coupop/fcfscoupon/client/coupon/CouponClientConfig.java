@@ -12,6 +12,7 @@ class CouponWebClientConfig {
     @Bean
     CouponWebService couponWebService() {
         final WebClient client = WebClient.builder()
+                .defaultStatusHandler(HttpStatusCode::isError, CouponClientException::of)
                 .baseUrl("http://localhost:8081")
                 .build();
         final HttpServiceProxyFactory factory = HttpServiceProxyFactory.builder(WebClientAdapter.forClient(client))
