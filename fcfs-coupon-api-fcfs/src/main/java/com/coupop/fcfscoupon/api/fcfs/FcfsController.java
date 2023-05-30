@@ -5,9 +5,12 @@ import com.coupop.fcfscoupon.api.fcfs.dto.HistoryResponse;
 import com.coupop.fcfscoupon.api.fcfs.dto.IssuanceRequest;
 import com.coupop.fcfscoupon.api.fcfs.dto.ResendRequest;
 import com.coupop.fcfscoupon.api.fcfs.support.RequestTime;
+import com.coupop.fcfscoupon.client.coupon.CouponService;
 import com.coupop.fcfscoupon.common.exception.ApiException;
-import com.coupop.fcfscoupon.domain.coupon.CouponService;
 import com.coupop.fcfscoupon.domain.fcfs.FcfsIssueService;
+import com.coupop.fcfscoupon.domain.history.HistoryService;
+import com.coupop.fcfscoupon.domain.history.dto.CouponIssueHistoryRecord;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
@@ -24,13 +27,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class FcfsController {
 
     private final FcfsIssueService fcfsIssueService;
+    private final HistoryService historyService;
     private final CouponService couponService;
     private final RequestTime requestTime;
 
     public FcfsController(final FcfsIssueService fcfsIssueService,
+                          final HistoryService historyService,
                           final CouponService couponService,
                           final RequestTime requestTime) {
         this.fcfsIssueService = fcfsIssueService;
+        this.historyService = historyService;
         this.couponService = couponService;
         this.requestTime = requestTime;
     }
@@ -44,7 +50,8 @@ public class FcfsController {
     @GetMapping("/history")
     @ResponseStatus(HttpStatus.OK)
     public HistoryResponse findHistoryByEmail(@RequestBody @Validated final HistoryRequest request) {
-        return couponService.findHistoryByEmail(request.email(), HistoryResponse::of);
+        final List<CouponIssueHistoryRecord> issueHistoryRecords = historyService.findByEmail(request.email());
+        return HistoryResponse.of(issueHistoryRecords);
     }
 
     @PostMapping("/resend")
@@ -72,6 +79,7 @@ public class FcfsController {
 
     @ExceptionHandler(Exception.class)
     public ErrorResponse handleServerExceptions(final Exception e) {
+        e.printStackTrace();
         return ErrorResponse.create(e, HttpStatus.INTERNAL_SERVER_ERROR, "서버에 오류가 발생했습니다.");
     }
 }

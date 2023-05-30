@@ -1,4 +1,4 @@
-package com.coupop.fcfscoupon.domain.coupon.exception;
+package com.coupop.fcfscoupon.domain.history.exception;
 
 import com.coupop.fcfscoupon.common.exception.NotFoundException;
 

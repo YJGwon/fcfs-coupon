@@ -1,4 +1,4 @@
-package com.coupop.fcfscoupon.api.coupon.testconfig;
+package com.coupop.fcfscoupon.domain.history.testconfig;
 
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;

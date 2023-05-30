@@ -23,21 +23,12 @@ public class RedisFcfsIssueRepository implements FcfsIssueRepository {
     }
 
     @Override
-    public Long remove(final String email) {
-        return remove(email, stringRedisTemplate.opsForSet());
-    }
-
-    @Override
     public Long getCount() {
         return getCount(stringRedisTemplate.opsForSet());
     }
 
     public Long add(final String email, final SetOperations<String, String> setOperations) {
         return setOperations.add(getKey(), email);
-    }
-
-    public Long remove(final String email, final SetOperations<String, String> setOperations) {
-        return setOperations.remove(getKey(), email);
     }
 
     public Long getCount(final SetOperations<String, String> setOperations) {

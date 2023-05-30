@@ -1,6 +1,6 @@
 package com.coupop.fcfscoupon.domain.fcfs;
 
-import com.coupop.fcfscoupon.client.coupon.CouponWebService;
+import com.coupop.fcfscoupon.client.coupon.CouponService;
 import com.coupop.fcfscoupon.domain.fcfs.exception.CouponNotOpenedException;
 import com.coupop.fcfscoupon.domain.fcfs.exception.CouponOutOfStockException;
 import com.coupop.fcfscoupon.domain.fcfs.exception.EmailAlreadyUsedException;
@@ -14,15 +14,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class FcfsIssueService {
 
-    private final CouponWebService couponWebService;
+    private final CouponService couponService;
 
     private final RedisFcfsIssueRepository redisFcfsIssueRepository;
     private final TransactionalRedisOperations transactionalRedisOperations;
 
-    public FcfsIssueService(final CouponWebService couponWebService,
+    public FcfsIssueService(final CouponService couponService,
                             final RedisFcfsIssueRepository redisFcfsIssueRepository,
                             final TransactionalRedisOperations transactionalRedisOperations) {
-        this.couponWebService = couponWebService;
+        this.couponService = couponService;
         this.redisFcfsIssueRepository = redisFcfsIssueRepository;
         this.transactionalRedisOperations = transactionalRedisOperations;
     }
@@ -31,18 +31,18 @@ public class FcfsIssueService {
         checkCouponOpen(requestTime);
         final Long sequence = checkIssuableAndGetSequence(email);
 
-        couponWebService.issue(sequence, email);
+        couponService.issue(sequence, email);
     }
 
     private Long checkIssuableAndGetSequence(final String email) {
         final List<Object> result = transactionalRedisOperations.startSession()
                 .multi()
                 .andThen(ops -> redisFcfsIssueRepository.getCount(ops.opsForSet()))
-                .andThen(ops -> redisFcfsIssueRepository.add(email))
+                .andThen(ops -> redisFcfsIssueRepository.add(email, ops.opsForSet()))
                 .exec();
 
         final Long count = (Long) result.get(0);
-        checkCouponInStock(count.intValue(), email); // remove email
+        checkCouponInStock(count.intValue(), email);
 
         final Long addResult = (Long) result.get(1);
         checkEmailNotUsedToday(addResult, email);
@@ -57,7 +57,6 @@ public class FcfsIssueService {
 
     private void checkCouponInStock(final int count, final String email) {
         if (FcfsIssuePolicy.isCouponOutOfStock(count)) {
-            redisFcfsIssueRepository.remove(email);
             throw new CouponOutOfStockException();
         }
     }

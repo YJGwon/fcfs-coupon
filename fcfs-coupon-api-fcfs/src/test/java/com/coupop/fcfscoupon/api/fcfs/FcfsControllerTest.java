@@ -12,21 +12,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.coupop.fcfscoupon.api.fcfs.dto.HistoryRequest;
-import com.coupop.fcfscoupon.api.fcfs.dto.HistoryResponse;
 import com.coupop.fcfscoupon.api.fcfs.dto.IssuanceRequest;
-import com.coupop.fcfscoupon.api.fcfs.dto.IssuedCouponResponse;
 import com.coupop.fcfscoupon.api.fcfs.dto.ResendRequest;
 import com.coupop.fcfscoupon.api.fcfs.support.RequestTime;
-import com.coupop.fcfscoupon.domain.coupon.CouponService;
-import com.coupop.fcfscoupon.domain.coupon.exception.HistoryNotFoundException;
+import com.coupop.fcfscoupon.client.coupon.CouponService;
 import com.coupop.fcfscoupon.domain.fcfs.FcfsIssueService;
 import com.coupop.fcfscoupon.domain.fcfs.exception.CouponNotOpenedException;
 import com.coupop.fcfscoupon.domain.fcfs.exception.CouponOutOfStockException;
 import com.coupop.fcfscoupon.domain.fcfs.exception.EmailAlreadyUsedException;
+import com.coupop.fcfscoupon.domain.history.HistoryService;
+import com.coupop.fcfscoupon.domain.history.dto.CouponIssueHistoryRecord;
+import com.coupop.fcfscoupon.domain.history.exception.HistoryNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.function.Function;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -51,6 +51,9 @@ class FcfsControllerTest {
 
     @MockBean
     private FcfsIssueService fcfsIssueService;
+
+    @MockBean
+    private HistoryService historyService;
 
     @MockBean
     private CouponService couponService;
@@ -148,11 +151,16 @@ class FcfsControllerTest {
         // given
         final String email = "foo@bar.com";
         final HistoryRequest request = new HistoryRequest(email);
-        final HistoryResponse response = new HistoryResponse(
-                List.of(new IssuedCouponResponse("fakeid", "2023-05-21")));
+        final List<CouponIssueHistoryRecord> issueHistoryRecords = List.of(new CouponIssueHistoryRecord(
+                "fakeid",
+                "foo@bar.com",
+                "fakeCouponId",
+                LocalDateTime.of(2023, 5, 21, 10, 0))
+        );
 
-        given(couponService.findHistoryByEmail(eq(email), any(Function.class)))
-                .willReturn(response);
+        given(historyService.findByEmail(eq(email)))
+                .willReturn(issueHistoryRecords);
+
         // when
         final ResultActions resultActions = performGet("/history", request);
 
@@ -172,7 +180,7 @@ class FcfsControllerTest {
         final HistoryRequest request = new HistoryRequest(email);
 
         doThrow(HistoryNotFoundException.ofEmail(email))
-                .when(couponService).findHistoryByEmail(eq(email), any(Function.class));
+                .when(historyService).findByEmail(email);
 
         // when
         final ResultActions resultActions = performGet("/history", request);
@@ -195,25 +203,6 @@ class FcfsControllerTest {
         // then
         resultActions
                 .andExpect(status().isAccepted());
-    }
-
-    @DisplayName("발급된 쿠폰에 대해 재발송을 요청할 때 해당하는 발급 이력이 없으면 Not Found를 응답한다.")
-    @Test
-    void resend_ifHistoryNotFound() throws Exception {
-        // given
-        final String invalidId = "fakeId";
-        final ResendRequest request = new ResendRequest(invalidId);
-
-        doThrow(HistoryNotFoundException.ofId(invalidId))
-                .when(couponService).resend(invalidId);
-
-        // when
-        final ResultActions resultActions = performPost("/resend", request);
-
-        // then
-        resultActions
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("title").value("쿠폰 발급 이력이 존재하지 않습니다."));
     }
 
     private ResultActions performGet(final String url, final Object request) throws Exception {

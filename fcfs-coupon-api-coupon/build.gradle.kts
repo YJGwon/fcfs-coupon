@@ -11,4 +11,8 @@ dependencies {
 
     // rest-assured
     testImplementation("io.rest-assured:rest-assured:5.3.0")
+
+    // for history test double
+    testImplementation(project(":fcfs-coupon-domain-history"))
+
 }

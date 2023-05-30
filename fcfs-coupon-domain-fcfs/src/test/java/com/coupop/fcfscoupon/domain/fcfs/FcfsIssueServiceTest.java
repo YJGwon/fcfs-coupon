@@ -3,24 +3,38 @@ package com.coupop.fcfscoupon.domain.fcfs;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 
-import com.coupop.fcfscoupon.domain.fcfs.testconfig.IntegrationTestConfig;
+import com.coupop.fcfscoupon.client.coupon.CouponService;
 import com.coupop.fcfscoupon.domain.fcfs.exception.CouponNotOpenedException;
 import com.coupop.fcfscoupon.domain.fcfs.exception.CouponOutOfStockException;
 import com.coupop.fcfscoupon.domain.fcfs.exception.EmailAlreadyUsedException;
 import com.coupop.fcfscoupon.domain.fcfs.model.FcfsIssuePolicy;
+import com.coupop.fcfscoupon.domain.fcfs.testconfig.DataSetup;
 import java.time.LocalTime;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 @SpringBootTest
-class FcfsIssueServiceTest extends IntegrationTestConfig {
+class FcfsIssueServiceTest {
 
     private static final LocalTime OPENED_TIME = FcfsIssuePolicy.getOpenAt();
 
     @Autowired
     private FcfsIssueService fcfsIssueService;
+
+    @Autowired
+    protected DataSetup dataSetup;
+
+    @MockBean
+    protected CouponService couponService;
+
+    @BeforeEach
+    void setUp() {
+        dataSetup.clean();
+    }
 
     @DisplayName("쿠폰을 발급한다.")
     @Test
@@ -56,7 +70,7 @@ class FcfsIssueServiceTest extends IntegrationTestConfig {
     @Test
     void issue_throwsException_ifCouponOutOfStock() {
         // given
-        databaseSetUp.setCount(FcfsIssuePolicy.getLimit());
+        dataSetup.setCount(FcfsIssuePolicy.getLimit());
 
         // when & then
         assertThatExceptionOfType(CouponOutOfStockException.class)

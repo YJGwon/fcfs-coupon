@@ -69,16 +69,23 @@ model, repository를 정의하고 service를 제공하는 비즈니스 모듈
 
 #### fcfs-coupon-domain-coupon
 
-- 쿠폰 생성 및 발송, 발급 이력 관리
+- 쿠폰 생성 및 발송
+
+#### fcfs-coupon-domain-history
+
+- 쿠폰 발급 이력 관리
 
 ### fcfs-coupon-common
+
 프로젝트 전반에 걸쳐 통용되는 규칙 정의
+
 - Exception spec 정의
 - 입력값 검증 정규식 정의
 
 ## ⚠️ 주의
 
 ### Windows 이외의 OS에서 Embedded Redis 실행 안됨
+
 embedded redis 실행 전 port가 사용 가능한지 Windows 명령어를 실행하여 확인합니다.
  
 Windows가 아닌 다른 OS에서 실행하기 위해서는 해당 로직 수정이 필요합니다.

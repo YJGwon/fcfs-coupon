@@ -12,8 +12,9 @@ import static org.springframework.http.HttpStatus.OK;
 import com.coupop.fcfscoupon.api.fcfs.dto.HistoryRequest;
 import com.coupop.fcfscoupon.api.fcfs.dto.IssuanceRequest;
 import com.coupop.fcfscoupon.api.fcfs.dto.ResendRequest;
-import com.coupop.fcfscoupon.api.fcfs.testconfig.IntegrationTestConfig;
-import com.coupop.fcfscoupon.domain.coupon.model.CouponIssueHistory;
+import com.coupop.fcfscoupon.api.fcfs.support.RequestTime;
+import com.coupop.fcfscoupon.api.fcfs.testconfig.DataSetup;
+import com.coupop.fcfscoupon.client.coupon.CouponService;
 import com.coupop.fcfscoupon.domain.fcfs.model.FcfsIssuePolicy;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -25,19 +26,34 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class FcfsAcceptanceTest extends IntegrationTestConfig {
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = FcfsApplication.class)
+public class FcfsAcceptanceTest {
 
     @LocalServerPort
     private int port;
 
+    @Autowired
+    private DataSetup dataSetup;
+
+    @MockBean
+    private RequestTime requestTime;
+
+    @MockBean
+    private CouponService couponService;
+
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+        dataSetup.cleanRedis();
+
+        given(requestTime.getValue())
+                .willReturn(FcfsIssuePolicy.getOpenAt());
     }
 
     @DisplayName("쿠폰을 발급받는다.")
@@ -106,7 +122,7 @@ public class FcfsAcceptanceTest extends IntegrationTestConfig {
     void issueCoupon_ifCouponOutOfStock() {
         // given
         final IssuanceRequest request = new IssuanceRequest("foo@bar.com");
-        databaseSetUp.setCount(FcfsIssuePolicy.getLimit());
+        dataSetup.setCount(FcfsIssuePolicy.getLimit());
 
         // when
         final ValidatableResponse response = post("/issue", request);
@@ -121,7 +137,7 @@ public class FcfsAcceptanceTest extends IntegrationTestConfig {
     void findHistoryByEmail() {
         // given
         final String email = "foo@bar.com";
-        databaseSetUp.addHistory(email);
+        dataSetup.addHistory(email);
 
         final HistoryRequest request = new HistoryRequest(email);
 
@@ -153,30 +169,13 @@ public class FcfsAcceptanceTest extends IntegrationTestConfig {
     void resend() {
         // given
         final String email = "foo@bar.com";
-        final CouponIssueHistory history = databaseSetUp.addHistory(email);
-        final String historyId = history.getId();
-
-        final ResendRequest request = new ResendRequest(historyId);
+        final ResendRequest request = new ResendRequest("fakeId");
 
         // when
         final ValidatableResponse response = post("resend", request);
 
         // then
         response.statusCode(ACCEPTED.value());
-    }
-
-    @DisplayName("해당하는 발급 이력이 존재하지 않으면 쿠폰을 재전송받을 수 없다.")
-    @Test
-    void resend_ifHistoryNotFound() {
-        // given
-        final ResendRequest request = new ResendRequest("invalidId");
-
-        // when
-        final ValidatableResponse response = post("resend", request);
-
-        // then
-        response.statusCode(NOT_FOUND.value())
-                .body("title", equalTo("쿠폰 발급 이력이 존재하지 않습니다."));
     }
 
     private ValidatableResponse get(final String url, final Object request) {
