@@ -1,14 +1,18 @@
 package com.coupop.fcfscoupon;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import com.coupop.fcfscoupon.api.coupon.dto.IssuanceRequest;
 import com.coupop.fcfscoupon.api.coupon.dto.SendRequest;
-import com.coupop.fcfscoupon.api.coupon.testconfig.IntegrationTestConfig;
+import com.coupop.fcfscoupon.api.coupon.testconfig.DataSetup;
 import com.coupop.fcfscoupon.domain.coupon.model.Coupon;
+import com.coupop.fcfscoupon.domain.coupon.model.CouponEmailSender;
+import com.coupop.fcfscoupon.domain.coupon.model.RandomCodeGenerator;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
@@ -17,19 +21,36 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class CouponAcceptanceTest extends IntegrationTestConfig {
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = CouponApplication.class)
+public class CouponAcceptanceTest {
 
     @LocalServerPort
     private int port;
 
+    protected static final String MOCKED_COUPON_VALUE = "fakevalue";
+
+    @Autowired
+    protected DataSetup dataSetup;
+
+    @MockBean
+    protected RandomCodeGenerator codeGenerator;
+
+    @MockBean
+    protected CouponEmailSender couponEmailSender;
+
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+        dataSetup.clean();
+
+        given(codeGenerator.generate(anyLong()))
+                .willReturn(MOCKED_COUPON_VALUE);
     }
 
     @DisplayName("쿠폰을 발급받는다.")

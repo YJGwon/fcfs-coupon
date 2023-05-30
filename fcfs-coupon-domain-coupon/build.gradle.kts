@@ -1,4 +1,5 @@
 dependencies {
+    implementation(project(":fcfs-coupon-domain-history"))
     implementation(project(":fcfs-coupon-common"))
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")

@@ -1,37 +1,55 @@
 package com.coupop.fcfscoupon.domain.coupon;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.springframework.data.mongodb.core.query.Criteria.where;
-import static org.springframework.data.mongodb.core.query.Query.query;
 
 import com.coupop.fcfscoupon.domain.coupon.exception.CouponNotFoundException;
-import com.coupop.fcfscoupon.domain.coupon.exception.HistoryNotFoundException;
 import com.coupop.fcfscoupon.domain.coupon.model.Coupon;
-import com.coupop.fcfscoupon.domain.coupon.model.CouponIssueHistory;
-import com.coupop.fcfscoupon.domain.coupon.testconfig.CouponIntegrationTestConfig;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.function.Function;
+import com.coupop.fcfscoupon.domain.coupon.model.CouponEmailSender;
+import com.coupop.fcfscoupon.domain.coupon.model.RandomCodeGenerator;
+import com.coupop.fcfscoupon.domain.coupon.testconfig.DataSetup;
+import com.coupop.fcfscoupon.domain.history.HistoryService;
+import com.coupop.fcfscoupon.domain.history.dto.CouponIssueHistoryRecord;
+import java.time.LocalDateTime;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
-
-class CouponServiceTest extends CouponIntegrationTestConfig {
+@SpringBootTest
+class CouponServiceTest {
+    protected static final String MOCKED_COUPON_VALUE = "fakevalue";
 
     @Autowired
     private CouponService couponService;
 
     @Autowired
-    private MongoTemplate mongoTemplate;
+    private DataSetup dataSetup;
+
+    @MockBean
+    private HistoryService historyService;
+
+    @MockBean
+    private RandomCodeGenerator codeGenerator;
+
+    @MockBean
+    private CouponEmailSender couponEmailSender;
+
+    @BeforeEach
+    void setUp() {
+        dataSetup.clean();
+
+        given(codeGenerator.generate(anyLong()))
+                .willReturn(MOCKED_COUPON_VALUE);
+    }
 
     @DisplayName("쿠폰을 생성하여 저장하고 쿠폰 발송 내역을 저장한 뒤 이메일을 발송한다.")
     @Test
@@ -43,37 +61,10 @@ class CouponServiceTest extends CouponIntegrationTestConfig {
         couponService.createAndSend(1L, email);
 
         // then
-        final Coupon savedCoupon = mongoTemplate.findOne(query(where("value").is(MOCKED_COUPON_VALUE)), Coupon.class);
-        final CouponIssueHistory savedHistory =
-                mongoTemplate.findOne(query(where("email").is(email)), CouponIssueHistory.class);
-
         assertAll(
-                () -> assertThat(savedCoupon).isNotNull(),
-                () -> assertThat(savedHistory).isNotNull(),
+                () -> verify(historyService).create(eq(email), anyString()),
                 () -> verify(couponEmailSender).send(any(Coupon.class), eq(email))
         );
-    }
-
-    @DisplayName("이메일로 쿠폰 발급 이력을 조회하여 응답한다.")
-    @Test
-    void findHistoryByEmail() {
-        // given
-        final String email = "foo@bar.com";
-        couponService.createAndSend(1L, email);
-
-        // when
-        final List<CouponIssueHistory> histories = couponService.findHistoryByEmail(email, Function.identity());
-
-        // then
-        assertThat(histories).hasSize(1);
-        assertThat(histories.get(0).getCreatedAt()).isEqualTo(LocalDate.now().toString());
-    }
-
-    @DisplayName("이메일로 쿠폰 발급 이력을 조회할때 이력이 존재하지 않으면 예외가 발생한다.")
-    @Test
-    void findHistoryByEmail_ifHistoryNotFound() {
-        assertThatExceptionOfType(HistoryNotFoundException.class)
-                .isThrownBy(() -> couponService.findHistoryByEmail("foo@bar.com", Function.identity()));
     }
 
     @DisplayName("이미 발급된 쿠폰에 대해 재전송을 요청하면 같은 이메일로 재전송한다.")
@@ -81,45 +72,34 @@ class CouponServiceTest extends CouponIntegrationTestConfig {
     void resend() {
         // given
         final String email = "foo@bar.com";
-        couponService.createAndSend(1L, email);
-        final CouponIssueHistory savedHistory = mongoTemplate
-                .findOne(query(where("email").is(email)), CouponIssueHistory.class);
+        final String historyId = "fakeId";
 
-        // when & then
-        assertAll(
-                () -> assertThatNoException()
-                        .isThrownBy(() -> couponService.resend(savedHistory.getId())),
-                () -> verify(couponEmailSender, times(2)).send(any(Coupon.class), eq(email))
-        );
+        given(historyService.findById(historyId))
+                .willReturn(
+                        new CouponIssueHistoryRecord(historyId, email, dataSetup.addCoupon(), LocalDateTime.now())
+                );
+
+        // when
+        couponService.resend(historyId);
+
+        // then
+        verify(couponEmailSender).send(any(Coupon.class), eq(email));
     }
 
-    @DisplayName("재전송을 요청할 때 해당하는 발급 이력이 없을 경우 예외가 발생한다.")
-    @Test
-    void resend_ifHistoryNotFound() {
-        assertThatExceptionOfType(HistoryNotFoundException.class)
-                .isThrownBy(() -> couponService.resend("invalidId"));
-    }
-
-    @DisplayName("쿠폰을 이메일로 발송한다.")
-    @Test
-    void send() {
-        // given
-        final String email = "foo@bar.com";
-        couponService.createAndSend(1L, email);
-        final Coupon saved = mongoTemplate.findOne(query(where("value").is(MOCKED_COUPON_VALUE)), Coupon.class);
-
-        // when & then
-        assertAll(
-                () -> assertThatNoException()
-                        .isThrownBy(() -> couponService.send(saved.getId(), email)),
-                () -> verify(couponEmailSender, times(2)).send(any(Coupon.class), eq(email))
-        );
-    }
-
-    @DisplayName("쿠폰 전송을 요청할 때 해당하는 쿠폰이 없을 경우 예외가 발생한다.")
+    @DisplayName("재전송을 요청할 때 해당하는 쿠폰이 없을 경우 예외가 발생한다.")
     @Test
     void send_ifCouponNotFound() {
+        // given
+        final String email = "foo@bar.com";
+        final String historyId = "fakeId";
+
+        given(historyService.findById(historyId))
+                .willReturn(
+                        new CouponIssueHistoryRecord(historyId, email, "invalidId", LocalDateTime.now())
+                );
+
+        // when & then
         assertThatExceptionOfType(CouponNotFoundException.class)
-                .isThrownBy(() -> couponService.send("invalidId", "foo@bar.com"));
+                .isThrownBy(() -> couponService.resend(historyId));
     }
 }
