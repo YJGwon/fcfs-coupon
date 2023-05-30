@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
-import com.coupop.fcfscoupon.client.coupon.CouponWebService;
 import com.coupop.fcfscoupon.domain.history.dto.CouponIssueHistoryRecord;
 import com.coupop.fcfscoupon.domain.history.exception.HistoryNotFoundException;
 import com.coupop.fcfscoupon.domain.history.model.CouponIssueHistory;
@@ -16,7 +15,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 @SpringBootTest
@@ -30,9 +28,6 @@ class HistoryServiceTest {
 
     @Autowired
     private MongoDatabaseCleaner databaseCleaner;
-
-    @MockBean
-    private CouponWebService couponWebService;
 
     @BeforeEach
     void cleanUp() {

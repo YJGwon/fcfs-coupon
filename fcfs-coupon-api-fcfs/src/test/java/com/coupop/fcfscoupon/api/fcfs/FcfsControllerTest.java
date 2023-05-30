@@ -15,6 +15,7 @@ import com.coupop.fcfscoupon.api.fcfs.dto.HistoryRequest;
 import com.coupop.fcfscoupon.api.fcfs.dto.IssuanceRequest;
 import com.coupop.fcfscoupon.api.fcfs.dto.ResendRequest;
 import com.coupop.fcfscoupon.api.fcfs.support.RequestTime;
+import com.coupop.fcfscoupon.client.coupon.CouponService;
 import com.coupop.fcfscoupon.domain.fcfs.FcfsIssueService;
 import com.coupop.fcfscoupon.domain.fcfs.exception.CouponNotOpenedException;
 import com.coupop.fcfscoupon.domain.fcfs.exception.CouponOutOfStockException;
@@ -53,6 +54,9 @@ class FcfsControllerTest {
 
     @MockBean
     private HistoryService historyService;
+
+    @MockBean
+    private CouponService couponService;
 
     @DisplayName("쿠폰 발행에 성공하면 Accepted 상태를 반환한다.")
     @Test
@@ -199,25 +203,6 @@ class FcfsControllerTest {
         // then
         resultActions
                 .andExpect(status().isAccepted());
-    }
-
-    @DisplayName("발급된 쿠폰에 대해 재발송을 요청할 때 해당하는 발급 이력이 없으면 Not Found를 응답한다.")
-    @Test
-    void resend_ifHistoryNotFound() throws Exception {
-        // given
-        final String invalidId = "fakeId";
-        final ResendRequest request = new ResendRequest(invalidId);
-
-        doThrow(HistoryNotFoundException.ofId(invalidId))
-                .when(historyService).resend(invalidId);
-
-        // when
-        final ResultActions resultActions = performPost("/resend", request);
-
-        // then
-        resultActions
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("title").value("쿠폰 발급 이력이 존재하지 않습니다."));
     }
 
     private ResultActions performGet(final String url, final Object request) throws Exception {

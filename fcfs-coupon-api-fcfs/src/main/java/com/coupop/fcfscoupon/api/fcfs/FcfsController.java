@@ -5,6 +5,7 @@ import com.coupop.fcfscoupon.api.fcfs.dto.HistoryResponse;
 import com.coupop.fcfscoupon.api.fcfs.dto.IssuanceRequest;
 import com.coupop.fcfscoupon.api.fcfs.dto.ResendRequest;
 import com.coupop.fcfscoupon.api.fcfs.support.RequestTime;
+import com.coupop.fcfscoupon.client.coupon.CouponService;
 import com.coupop.fcfscoupon.common.exception.ApiException;
 import com.coupop.fcfscoupon.domain.fcfs.FcfsIssueService;
 import com.coupop.fcfscoupon.domain.history.HistoryService;
@@ -27,13 +28,16 @@ public class FcfsController {
 
     private final FcfsIssueService fcfsIssueService;
     private final HistoryService historyService;
+    private final CouponService couponService;
     private final RequestTime requestTime;
 
     public FcfsController(final FcfsIssueService fcfsIssueService,
                           final HistoryService historyService,
+                          final CouponService couponService,
                           final RequestTime requestTime) {
         this.fcfsIssueService = fcfsIssueService;
         this.historyService = historyService;
+        this.couponService = couponService;
         this.requestTime = requestTime;
     }
 
@@ -53,7 +57,7 @@ public class FcfsController {
     @PostMapping("/resend")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void resend(@RequestBody final ResendRequest request) {
-        historyService.resend(request.historyId());
+        couponService.resend(request.historyId());
     }
 
     @ExceptionHandler(ApiException.class)
@@ -75,6 +79,7 @@ public class FcfsController {
 
     @ExceptionHandler(Exception.class)
     public ErrorResponse handleServerExceptions(final Exception e) {
+        e.printStackTrace();
         return ErrorResponse.create(e, HttpStatus.INTERNAL_SERVER_ERROR, "서버에 오류가 발생했습니다.");
     }
 }

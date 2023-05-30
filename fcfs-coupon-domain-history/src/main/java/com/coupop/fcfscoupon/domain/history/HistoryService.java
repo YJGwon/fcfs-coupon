@@ -1,6 +1,5 @@
 package com.coupop.fcfscoupon.domain.history;
 
-import com.coupop.fcfscoupon.client.coupon.CouponWebService;
 import com.coupop.fcfscoupon.domain.history.dto.CouponIssueHistoryRecord;
 import com.coupop.fcfscoupon.domain.history.exception.HistoryNotFoundException;
 import com.coupop.fcfscoupon.domain.history.model.CouponIssueHistory;
@@ -12,12 +11,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class HistoryService {
 
-    private final CouponWebService couponWebService;
     private final CouponIssueHistoryRepository couponIssueHistoryRepository;
 
-    public HistoryService(final CouponWebService couponWebService,
-                          final CouponIssueHistoryRepository couponIssueHistoryRepository) {
-        this.couponWebService = couponWebService;
+    public HistoryService(final CouponIssueHistoryRepository couponIssueHistoryRepository) {
         this.couponIssueHistoryRepository = couponIssueHistoryRepository;
     }
 
@@ -35,15 +31,6 @@ public class HistoryService {
         return histories.stream()
                 .map(CouponIssueHistoryRecord::of)
                 .toList();
-    }
-
-    public void resend(final String historyId) {
-        final Optional<CouponIssueHistory> found = couponIssueHistoryRepository.findById(historyId);
-        if (found.isEmpty()) {
-            throw HistoryNotFoundException.ofId(historyId);
-        }
-        final CouponIssueHistory history = found.get();
-        couponWebService.send(history.getCouponId(), history.getEmail());
     }
 
     public CouponIssueHistoryRecord findById(final String historyId) {
