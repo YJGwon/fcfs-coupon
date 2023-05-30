@@ -1,4 +1,4 @@
-package com.coupop.fcfscoupon.domain.coupon;
+package com.coupop.fcfscoupon.domain;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
