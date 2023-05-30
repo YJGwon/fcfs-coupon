@@ -46,13 +46,4 @@ public class CouponService {
         final Coupon coupon = found.get();
         couponEmailSender.send(coupon, history.email());
     }
-
-    public void send(final String couponId, final String email) {
-        final Optional<Coupon> found = couponRepository.findById(couponId);
-        if (found.isEmpty()) {
-            throw new CouponNotFoundException(couponId);
-        }
-        final Coupon coupon = found.get();
-        couponEmailSender.send(coupon, email);
-    }
 }
