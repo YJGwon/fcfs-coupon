@@ -15,14 +15,14 @@ import com.coupop.fcfscoupon.domain.coupon.model.CouponEmailSender;
 import com.coupop.fcfscoupon.domain.coupon.model.RandomCodeGenerator;
 import com.coupop.fcfscoupon.domain.coupon.testconfig.DataSetup;
 import com.coupop.fcfscoupon.domain.history.HistoryService;
-import com.coupop.fcfscoupon.domain.history.dto.CouponIssueHistoryRecord;
-import java.time.LocalDateTime;
+import com.coupop.fcfscoupon.domain.history.model.CouponIssueHistory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 
 @SpringBootTest
 class CouponServiceTest {
@@ -34,7 +34,7 @@ class CouponServiceTest {
     @Autowired
     private DataSetup dataSetup;
 
-    @MockBean
+    @SpyBean
     private HistoryService historyService;
 
     @MockBean
@@ -72,15 +72,10 @@ class CouponServiceTest {
     void resend() {
         // given
         final String email = "foo@bar.com";
-        final String historyId = "fakeId";
-
-        given(historyService.findById(historyId))
-                .willReturn(
-                        new CouponIssueHistoryRecord(historyId, email, dataSetup.addCoupon(), LocalDateTime.now())
-                );
+        final CouponIssueHistory history = dataSetup.addHistory(dataSetup.addCoupon().getId(), email);
 
         // when
-        couponService.resend(historyId);
+        couponService.resend(history.getId());
 
         // then
         verify(couponEmailSender).send(any(Coupon.class), eq(email));
@@ -91,15 +86,10 @@ class CouponServiceTest {
     void send_ifCouponNotFound() {
         // given
         final String email = "foo@bar.com";
-        final String historyId = "fakeId";
-
-        given(historyService.findById(historyId))
-                .willReturn(
-                        new CouponIssueHistoryRecord(historyId, email, "invalidId", LocalDateTime.now())
-                );
+        final CouponIssueHistory history = dataSetup.addHistory("invalidId", email);
 
         // when & then
         assertThatExceptionOfType(CouponNotFoundException.class)
-                .isThrownBy(() -> couponService.resend(historyId));
+                .isThrownBy(() -> couponService.resend(history.getId()));
     }
 }
