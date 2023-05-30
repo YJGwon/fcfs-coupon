@@ -21,8 +21,10 @@ public class HistoryService {
         this.couponIssueHistoryRepository = couponIssueHistoryRepository;
     }
 
-    public void create(final String email, final String couponId) {
-        couponIssueHistoryRepository.save(CouponIssueHistory.ofNew(email, couponId));
+    public String create(final String email, final String couponId) {
+        final CouponIssueHistory couponIssueHistory = CouponIssueHistory.ofNew(email, couponId);
+        couponIssueHistoryRepository.save(couponIssueHistory);
+        return couponIssueHistory.getId();
     }
 
     public List<CouponIssueHistoryRecord> findByEmail(final String email) {
@@ -42,5 +44,14 @@ public class HistoryService {
         }
         final CouponIssueHistory history = found.get();
         couponWebService.send(history.getCouponId(), history.getEmail());
+    }
+
+    public CouponIssueHistoryRecord findById(final String historyId) {
+        final Optional<CouponIssueHistory> found = couponIssueHistoryRepository.findById(historyId);
+        if (found.isEmpty()) {
+            throw HistoryNotFoundException.ofId(historyId);
+        }
+        final CouponIssueHistory history = found.get();
+        return CouponIssueHistoryRecord.of(history);
     }
 }

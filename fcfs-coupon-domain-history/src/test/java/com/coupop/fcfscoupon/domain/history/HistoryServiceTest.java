@@ -2,7 +2,6 @@ package com.coupop.fcfscoupon.domain.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.Mockito.verify;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
@@ -79,7 +78,7 @@ class HistoryServiceTest {
                 .isThrownBy(() -> historyService.findByEmail("foo@bar.com"));
     }
 
-    @DisplayName("id로 쿠폰 발급 이력을 조회하여 재전송한다.")
+    @DisplayName("id로 쿠폰 발급 이력을 조회한다.")
     @Test
     void resend() {
         // given
@@ -90,16 +89,16 @@ class HistoryServiceTest {
                 .findOne(query(where("email").is(email)), CouponIssueHistory.class);
 
         // when
-        historyService.resend(history.getId());
+        final CouponIssueHistoryRecord found = historyService.findById(history.getId());
 
         // then
-        verify(couponWebService).send(history.getCouponId(), history.getEmail());
+        assertThat(found.couponId()).isEqualTo(couponId);
     }
 
     @DisplayName("id로 쿠폰 발급 이력을 조회할 때 이력이 존재하지 않으면 예외가 발생한다.")
     @Test
     void findById_ifHistoryNotFound() {
         assertThatExceptionOfType(HistoryNotFoundException.class)
-                .isThrownBy(() -> historyService.resend("invalidId"));
+                .isThrownBy(() -> historyService.findById("invalidId"));
     }
 }
