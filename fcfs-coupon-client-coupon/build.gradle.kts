@@ -8,5 +8,5 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
 
     // mock web server
-    testImplementation("com.squareup.okhttp3:mockwebserver")
+    testImplementation("org.mock-server:mockserver-netty:5.15.0")
 }
