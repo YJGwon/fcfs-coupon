@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockserver.integration.ClientAndServer;
+import org.mockserver.model.MediaType;
 import org.mockserver.verify.VerificationTimes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -46,6 +47,8 @@ class CouponServiceTest {
                 request()
                         .withMethod("POST")
                         .withPath("/issue")
+                        .withContentType(MediaType.APPLICATION_JSON)
+                        .withHeader("accept", MediaType.APPLICATION_JSON.toString())
                         .withBody(objectMapper.writeValueAsBytes(new IssuanceRequest(seq, email))),
                 VerificationTimes.once()
         );
@@ -60,6 +63,8 @@ class CouponServiceTest {
                 request()
                         .withMethod("POST")
                         .withPath("/resend")
+                        .withContentType(MediaType.APPLICATION_JSON)
+                        .withHeader("accept", MediaType.APPLICATION_JSON.toString())
                         .withBody(objectMapper.writeValueAsBytes(new ResendRequest(historyId))),
                 VerificationTimes.once()
         );
