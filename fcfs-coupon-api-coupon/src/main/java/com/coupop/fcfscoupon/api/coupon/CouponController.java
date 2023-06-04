@@ -4,6 +4,7 @@ import com.coupop.fcfscoupon.api.coupon.dto.IssuanceRequest;
 import com.coupop.fcfscoupon.api.coupon.dto.ResendRequest;
 import com.coupop.fcfscoupon.common.exception.ApiException;
 import com.coupop.fcfscoupon.domain.coupon.CouponService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
@@ -16,13 +17,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequiredArgsConstructor
 public class CouponController {
 
     private final CouponService couponService;
-
-    public CouponController(final CouponService couponService) {
-        this.couponService = couponService;
-    }
 
     @PostMapping("/issue")
     @ResponseStatus(HttpStatus.ACCEPTED)

@@ -9,23 +9,17 @@ import com.coupop.fcfscoupon.domain.fcfs.persistence.RedisFcfsIssueRepository;
 import com.coupop.fcfscoupon.domain.fcfs.support.TransactionalRedisOperations;
 import java.time.LocalTime;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class FcfsIssueService {
 
     private final CouponService couponService;
 
     private final RedisFcfsIssueRepository redisFcfsIssueRepository;
     private final TransactionalRedisOperations transactionalRedisOperations;
-
-    public FcfsIssueService(final CouponService couponService,
-                            final RedisFcfsIssueRepository redisFcfsIssueRepository,
-                            final TransactionalRedisOperations transactionalRedisOperations) {
-        this.couponService = couponService;
-        this.redisFcfsIssueRepository = redisFcfsIssueRepository;
-        this.transactionalRedisOperations = transactionalRedisOperations;
-    }
 
     public void issue(final String email, final LocalTime requestTime) {
         checkCouponOpen(requestTime);
