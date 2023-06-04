@@ -23,6 +23,11 @@ subprojects {
     apply(plugin = "org.springframework.boot")
     apply(plugin = "io.spring.dependency-management")
 
+    dependencies {
+        compileOnly ("org.projectlombok:lombok")
+        annotationProcessor ("org.projectlombok:lombok")
+    }
+
     tasks.withType<Test> {
         useJUnitPlatform()
     }
