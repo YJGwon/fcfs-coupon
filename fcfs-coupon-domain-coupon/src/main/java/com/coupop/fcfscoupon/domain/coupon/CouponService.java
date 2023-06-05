@@ -8,9 +8,11 @@ import com.coupop.fcfscoupon.domain.coupon.model.RandomCodeGenerator;
 import com.coupop.fcfscoupon.domain.history.HistoryService;
 import com.coupop.fcfscoupon.domain.history.dto.CouponIssueHistoryRecord;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class CouponService {
 
     private final RandomCodeGenerator codeGenerator;
@@ -18,16 +20,6 @@ public class CouponService {
 
     private final CouponRepository couponRepository;
     private final HistoryService historyService;
-
-    public CouponService(final RandomCodeGenerator codeGenerator,
-                         final CouponEmailSender couponEmailSender,
-                         final CouponRepository couponRepository,
-                         final HistoryService historyService) {
-        this.codeGenerator = codeGenerator;
-        this.couponEmailSender = couponEmailSender;
-        this.couponRepository = couponRepository;
-        this.historyService = historyService;
-    }
 
     public void createAndSend(final Long sequence, final String email) {
         final Coupon coupon = new Coupon(codeGenerator.generate(sequence));

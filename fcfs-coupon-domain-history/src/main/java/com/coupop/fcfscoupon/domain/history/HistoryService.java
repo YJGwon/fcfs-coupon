@@ -6,16 +6,14 @@ import com.coupop.fcfscoupon.domain.history.model.CouponIssueHistory;
 import com.coupop.fcfscoupon.domain.history.model.CouponIssueHistoryRepository;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class HistoryService {
 
     private final CouponIssueHistoryRepository couponIssueHistoryRepository;
-
-    public HistoryService(final CouponIssueHistoryRepository couponIssueHistoryRepository) {
-        this.couponIssueHistoryRepository = couponIssueHistoryRepository;
-    }
 
     public String create(final String email, final String couponId) {
         final CouponIssueHistory couponIssueHistory = CouponIssueHistory.ofNew(email, couponId);

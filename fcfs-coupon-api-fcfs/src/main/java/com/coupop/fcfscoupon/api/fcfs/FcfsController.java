@@ -11,6 +11,7 @@ import com.coupop.fcfscoupon.domain.fcfs.FcfsIssueService;
 import com.coupop.fcfscoupon.domain.history.HistoryService;
 import com.coupop.fcfscoupon.domain.history.dto.CouponIssueHistoryRecord;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
@@ -24,22 +25,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequiredArgsConstructor
 public class FcfsController {
 
     private final FcfsIssueService fcfsIssueService;
     private final HistoryService historyService;
     private final CouponService couponService;
     private final RequestTime requestTime;
-
-    public FcfsController(final FcfsIssueService fcfsIssueService,
-                          final HistoryService historyService,
-                          final CouponService couponService,
-                          final RequestTime requestTime) {
-        this.fcfsIssueService = fcfsIssueService;
-        this.historyService = historyService;
-        this.couponService = couponService;
-        this.requestTime = requestTime;
-    }
 
     @PostMapping("/issue")
     @ResponseStatus(HttpStatus.ACCEPTED)
